@@ -60,6 +60,7 @@
     ],
 	"containers": [
 		{
+			"binding": "Sandbox",
 			"class_name": "UserAppSandboxService",
 			"image": "./SandboxDockerfile",
             // Altering max_instances value will have no effect. Please use the MAX_SANDBOX_INSTANCES var instead.
@@ -89,10 +90,6 @@
 				"name": "CodeGenObject"
 			},
             {
-                "class_name": "UserAppSandboxService",
-                "name": "Sandbox"
-            },
-            {
                 "class_name": "DORateLimitStore",
                 "name": "DORateLimitStore"
             }
@@ -118,8 +115,7 @@
 	"migrations": [
 		{
 			"new_sqlite_classes": [
-				"CodeGeneratorAgent",
-				"UserAppSandboxService"
+				"CodeGeneratorAgent"
 			],
 			"tag": "v1"
 		},
