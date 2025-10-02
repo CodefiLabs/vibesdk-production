@@ -87,7 +87,7 @@ export function GlobalHeader() {
 							transition={{ delay: 0.2 }}
 							className="flex flex-wrap items-center justify-end gap-3 justify-self-end"
 						>
-							<div className="gap-6 flex flex-col justify-between border px-3 bg-bg-4 dark:bg-bg-2 rounded-md py-1.5 border-accent/50 dark:border-accent/50 !border-t-transparent rounded-t-none ml-2 md:ml-6 -mt-2">
+							{/* <div className="gap-6 flex flex-col justify-between border px-3 bg-bg-4 dark:bg-bg-2 rounded-md py-1.5 border-accent/50 dark:border-accent/50 !border-t-transparent rounded-t-none ml-2 md:ml-6 -mt-2">
 								<div className="flex w-full gap-2 items-center">
 									<div className='text-text-primary/80 mr-4 text-lg font-medium'>Deploy your own vibe-coding platform</div>
 									<div className="flex font-semibold gap-2 items-center bg-accent dark:bg-accent text-white rounded px-2 hover:opacity-80 cursor-pointer" onClick={() => window.open("https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/vibesdk", "_blank")}>
@@ -97,7 +97,7 @@ export function GlobalHeader() {
 										Fork <GithubIcon className="size-4" />
 									</div>
 								</div>
-							</div>
+							</div> */}
 							{/* Disable cost display for now */}
 							{/* {user && (
 							<CostDisplay
