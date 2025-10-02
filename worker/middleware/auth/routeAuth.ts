@@ -36,27 +36,27 @@ export interface AuthRequirement {
  */
 export const AuthConfig = {
     // Public route - no authentication required
-    public: { 
+    public: {
         required: false,
         level: 'public' as const
     },
-    
+
     // Require full authentication (no anonymous users)
-    authenticated: { 
-        required: true, 
-        level: 'authenticated' as const 
+    authenticated: {
+        required: true,
+        level: 'authenticated' as const
     },
-    
+
     // Require resource ownership (for app editing)
-    ownerOnly: { 
-        required: true, 
+    ownerOnly: {
+        required: true,
         level: 'owner-only' as const,
         resourceOwnershipCheck: checkAppOwnership
     },
-    
+
     // Public read access, but owner required for modifications
-    publicReadOwnerWrite: { 
-        required: false 
+    publicReadOwnerWrite: {
+        required: false
     }
 } as const;
 
@@ -143,7 +143,7 @@ export async function enforceAuthRequirement(c: Context<AppEnv>) : Promise<Respo
         logger.error('No authentication level found');
         return errorResponse('No authentication level found', 500);
     }
-    
+
     // Only perform auth if we need it or don't have user yet
     if (!user && (requirement.level === 'authenticated' || requirement.level === 'owner-only')) {
         const userSession = await authMiddleware(c.req.raw, c.env);
@@ -168,7 +168,7 @@ export async function enforceAuthRequirement(c: Context<AppEnv>) : Promise<Respo
             return errorResponse('Internal server error', 500);
         }
     }
-    
+
     const params = c.req.param();
     const env = c.env;
     const result = await routeAuthChecks(user, env, requirement, params);

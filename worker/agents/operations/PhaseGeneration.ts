@@ -21,9 +21,9 @@ const SYSTEM_PROMPT = `<ROLE>
 
 <TASK>
     You are given the blueprint (PRD) and the client query. You will be provided with all previously implemented project phases, the current latest snapshot of the codebase, and any current runtime issues or static analysis reports.
-    
+
     **Your primary task:** Design the next phase of the project as a deployable milestone leading to project completion or to address any user feedbacks or reported bugs.
-    
+
     **Phase Planning Process:**
     1. **ANALYZE** current codebase state and identify what's implemented vs. what remains
     2. **PRIORITIZE** critical runtime errors that block deployment or user reported issues (render loops, undefined errors, import issues)
@@ -34,7 +34,7 @@ const SYSTEM_PROMPT = `<ROLE>
        - **Accessibility**: Proper semantic HTML, ARIA labels, keyboard navigation
        - **Supreme software development practices**: Follow the best coding principles and practices, and lay out the codebase in a way that is easy to maintain, extend and debug.
     4. **VALIDATE** that the phase will be deployable with all views/pages working beautifully across devices
-    
+
     The project needs to be fully ready to ship in a reasonable amount of time. Plan accordingly.
     If no more phases are needed, conclude by putting blank fields in the response.
     Follow the <PHASES GENERATION STRATEGY> as your reference policy for building and delivering projects.
@@ -86,20 +86,20 @@ These are the only dependencies, components and plugins available for the projec
 
 const NEXT_PHASE_USER_PROMPT = `**GENERATE THE PHASE**
 {{generateInstructions}}
-Adhere to the following guidelines: 
+Adhere to the following guidelines:
 
 <SUGGESTING NEXT PHASE>
 •   Suggest the next phase based on the current progress, the overall application architecture, suggested phases in the blueprint, current runtime errors/bugs and any user suggestions.
 •   Please ignore non functional or non critical issues. Your primary task is to suggest project development phases. Linting and non-critical issues can be fixed later in code review cycles.
 •   **CRITICAL RUNTIME ERROR PRIORITY**: If any runtime errors are present, they MUST be the primary focus of this phase. Runtime errors prevent deployment and user testing.
-    
+
     **Priority Order for Critical Errors:**
     1. **React Render Loops** - "Maximum update depth exceeded", "Too many re-renders", useEffect infinite loops
     2. **Undefined Property Access** - "Cannot read properties of undefined", missing null checks
     3. **Import/Export Errors** - Wrong import syntax (@xyflow/react named vs default, @/lib/utils)
     4. **Tailwind Class Errors** - Invalid classes (border-border vs border)
     5. **Component Definition Errors** - Missing exports, undefined components
-    
+
     **Error Handling Protocol:**
     - Name phase to reflect fixes: "Fix Critical Runtime Errors and [Feature]"
     - Cross-reference any code line or file name with current code structure
@@ -113,7 +113,7 @@ Adhere to the following guidelines:
     - Thoroughly review the current codebase and identify and fix any bugs, incomplete features or unimplemented stuff.
 •   **BEAUTIFUL UI PRIORITY**: Next phase should cover fixes (if any), development, AND significant focus on creating visually stunning, professional-grade UI/UX with:
     - Modern design patterns and visual hierarchy
-    - Smooth animations and micro-interactions  
+    - Smooth animations and micro-interactions
     - Beautiful color schemes and typography
     - Proper spacing, shadows, and visual polish
     - Engaging user interface elements
@@ -137,7 +137,7 @@ const formatUserSuggestions = (suggestions?: string[] | null): string => {
     if (!suggestions || suggestions.length === 0) {
         return '';
     }
-    
+
     return `
 <USER SUGGESTIONS>
 The following client suggestions and feedback have been provided, relayed by our client conversation agent.
@@ -171,13 +171,13 @@ const userPromptFormatter = (issues: IssueReport, userSuggestions?: string[], is
     let prompt = NEXT_PHASE_USER_PROMPT
         .replaceAll('{{issues}}', issuesPromptFormatterWithGuidelines(issues))
         .replaceAll('{{userSuggestions}}', formatUserSuggestions(userSuggestions));
-    
+
     if (isUserSuggestedPhase) {
         prompt = prompt.replaceAll('{{generateInstructions}}', 'User requested some changes/modifications. Please thoroughly review the user suggestions and generate the next phase of the application accordingly');
     } else {
         prompt = prompt.replaceAll('{{generateInstructions}}', 'Generate the next phase of the application.');
     }
-    
+
     return PROMPT_UTILS.verifyPrompt(prompt);
 }
 export class PhaseGenerationOperation extends AgentOperation<PhaseGenerationInputs, PhaseConceptGenerationSchemaType> {
@@ -194,9 +194,9 @@ export class PhaseGenerationOperation extends AgentOperation<PhaseGenerationInpu
             const imagesInfo = userContext?.images && userContext.images.length > 0
                 ? ` and ${userContext.images.length} image(s)`
                 : "";
-            
+
             logger.info(`Generating next phase ${suggestionsInfo}${imagesInfo}`);
-    
+
             // Create user message with optional images
             const userPrompt = userPromptFormatter(issues, userContext?.suggestions, isUserSuggestedPhase);
             const userMessage = userContext?.images && userContext.images.length > 0
@@ -206,12 +206,12 @@ export class PhaseGenerationOperation extends AgentOperation<PhaseGenerationInpu
                     'high'
                 )
                 : createUserMessage(userPrompt);
-            
+
             const messages: Message[] = [
                 ...getSystemPromptWithProjectContext(SYSTEM_PROMPT, context),
                 userMessage
             ];
-    
+
             const { object: results } = await executeInference({
                 env: env,
                 messages,
@@ -221,9 +221,9 @@ export class PhaseGenerationOperation extends AgentOperation<PhaseGenerationInpu
                 reasoning_effort: (userContext?.suggestions || issues.runtimeErrors.length > 0) ? AGENT_CONFIG.phaseGeneration.reasoning_effort == 'low' ? 'medium' : 'high' : undefined,
                 format: 'markdown',
             });
-    
+
             logger.info(`Generated next phase: ${results.name}, ${results.description}`);
-    
+
             return results;
         } catch (error) {
             logger.error("Error generating next phase:", error);

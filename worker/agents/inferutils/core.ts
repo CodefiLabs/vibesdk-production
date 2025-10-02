@@ -32,7 +32,7 @@ function optimizeInputs(messages: Message[]): Message[] {
     }));
 }
 
-// Streaming tool-call accumulation helpers 
+// Streaming tool-call accumulation helpers
 type ToolCallsArray = NonNullable<NonNullable<ChatCompletionChunk['choices'][number]['delta']>['tool_calls']>;
 type ToolCallDelta = ToolCallsArray[number];
 type ToolAccumulatorEntry = ChatCompletionMessageFunctionToolCall & { index?: number; __order: number };
@@ -189,10 +189,10 @@ function optimizeTextContent(content: string): string {
 
 export async function buildGatewayUrl(env: Env, providerOverride?: AIGatewayProviders): Promise<string> {
     // If CLOUDFLARE_AI_GATEWAY_URL is set and is a valid URL, use it directly
-    if (env.CLOUDFLARE_AI_GATEWAY_URL && 
-        env.CLOUDFLARE_AI_GATEWAY_URL !== 'none' && 
+    if (env.CLOUDFLARE_AI_GATEWAY_URL &&
+        env.CLOUDFLARE_AI_GATEWAY_URL !== 'none' &&
         env.CLOUDFLARE_AI_GATEWAY_URL.trim() !== '') {
-        
+
         try {
             const url = new URL(env.CLOUDFLARE_AI_GATEWAY_URL);
             // Validate it's actually an HTTP/HTTPS URL
@@ -207,7 +207,7 @@ export async function buildGatewayUrl(env: Env, providerOverride?: AIGatewayProv
             console.warn(`Invalid CLOUDFLARE_AI_GATEWAY_URL provided: ${env.CLOUDFLARE_AI_GATEWAY_URL}. Falling back to AI bindings.`);
         }
     }
-    
+
     // Build the url via bindings
     const gateway = env.AI.gateway(env.CLOUDFLARE_AI_GATEWAY);
     const baseUrl = providerOverride ? await gateway.getUrl(providerOverride) : `${await gateway.getUrl()}compat`;
@@ -245,7 +245,7 @@ async function getApiKey(provider: string, env: Env, _userId: string): Promise<s
     const providerKeyString = provider.toUpperCase().replaceAll('-', '_');
     const envKey = `${providerKeyString}_API_KEY` as keyof Env;
     let apiKey: string = env[envKey] as string;
-    
+
     // Check if apiKey is empty or undefined and is valid
     if (!isValidApiKey(apiKey)) {
         apiKey = env.CLOUDFLARE_AI_GATEWAY_TOKEN;
@@ -254,8 +254,8 @@ async function getApiKey(provider: string, env: Env, _userId: string): Promise<s
 }
 
 export async function getConfigurationForModel(
-    model: AIModels | string, 
-    env: Env, 
+    model: AIModels | string,
+    env: Env,
     userId: string,
 ): Promise<{
     baseURL: string,
@@ -438,7 +438,7 @@ export async function infer<OutputSchema extends z.AnyZodObject>({
     if (messages.length > MAX_LLM_MESSAGES) {
         throw new RateLimitExceededError(`Message limit exceeded: ${messages.length} messages (max: ${MAX_LLM_MESSAGES}). Please use context compactification.`, RateLimitType.LLM_CALLS);
     }
-    
+
     // Check tool calling depth to prevent infinite recursion
     const currentDepth = toolCallContext?.depth ?? 0;
     if (currentDepth >= MAX_TOOL_CALLING_DEPTH) {
@@ -447,12 +447,12 @@ export async function infer<OutputSchema extends z.AnyZodObject>({
         if (schema) {
             throw new Error(`Maximum tool calling depth (${MAX_TOOL_CALLING_DEPTH}) exceeded. Tools may be calling each other recursively.`);
         }
-        return { 
+        return {
             string: `[System: Maximum tool calling depth reached.]`,
-            toolCallContext 
+            toolCallContext
         };
     }
-    
+
     try {
         const authUser: AuthUser = {
             id: metadata.userId,
@@ -583,16 +583,16 @@ export async function infer<OutputSchema extends z.AnyZodObject>({
                 const byIndex = new Map<number, ToolAccumulatorEntry>();
                 const byId = new Map<string, ToolAccumulatorEntry>();
                 const orderCounterRef = { value: 0 };
-                
+
                 for await (const event of response) {
                     const delta = (event as ChatCompletionChunk).choices[0]?.delta;
-                    
+
                     // Provider-specific logging
                     const provider = modelName.split('/')[0];
                     if (delta?.tool_calls && (provider === 'google-ai-studio' || provider === 'gemini')) {
                         console.log(`[PROVIDER_DEBUG] ${provider} tool_calls delta:`, JSON.stringify(delta.tool_calls, null, 2));
                     }
-                    
+
                     if (delta?.tool_calls) {
                         try {
                             for (const deltaToolCall of delta.tool_calls as ToolCallsArray) {
@@ -602,7 +602,7 @@ export async function infer<OutputSchema extends z.AnyZodObject>({
                             console.error('Error processing tool calls in streaming:', error);
                         }
                     }
-                    
+
                     // Process content
                     content += delta?.content || '';
                     const slice = content.slice(streamIndex);
@@ -612,10 +612,10 @@ export async function infer<OutputSchema extends z.AnyZodObject>({
                         streamIndex += slice.length;
                     }
                 }
-                
+
                 // Assemble toolCalls with preference for index ordering, else first-seen order
                 toolCalls = assembleToolCalls(byIndex, byId);
-                
+
                 // Validate accumulated tool calls (do not mutate arguments)
                 for (const toolCall of toolCalls) {
                     if (!toolCall.function.name) {
@@ -691,9 +691,9 @@ export async function infer<OutputSchema extends z.AnyZodObject>({
                 messages: newMessages,
                 depth: newDepth
             };
-            
+
             console.log(`Tool calling depth: ${newDepth}/${MAX_TOOL_CALLING_DEPTH}`);
-            
+
             if (schema && schemaName) {
                 const output = await infer<OutputSchema>({
                     env,

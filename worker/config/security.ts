@@ -41,12 +41,12 @@ export function getConfigurableSecurityDefaults(): ConfigurableSecuritySettings 
  */
 function getAllowedOrigins(env: Env): string[] {
     const origins: string[] = [];
-    
+
     // Production domains
     if (env.CUSTOM_DOMAIN) {
         origins.push(`https://${env.CUSTOM_DOMAIN}`);
     }
-    
+
     // Development origins (only in development)
     if (isDev(env)) {
         origins.push('http://localhost:3000');
@@ -56,7 +56,7 @@ function getAllowedOrigins(env: Env): string[] {
         origins.push('http://127.0.0.1:5173');
         origins.push('http://127.0.0.1:8787');
     }
-    
+
     return origins;
 }
 
@@ -92,12 +92,12 @@ export function getCORSConfig(env: Env): CORSConfig {
  */
 export function getCSRFConfig(env: Env): CSRFConfig {
     const allowedOrigins = getAllowedOrigins(env);
-    
+
     return {
         origin: (origin: string) => {
             // Reject missing origin headers for CSRF protection
             if (!origin) return false;
-            
+
             // Check against allowed origins
             return allowedOrigins.includes(origin);
         },
@@ -151,7 +151,7 @@ interface SecureHeadersConfig {
  */
 export function getSecureHeadersConfig(env: Env): SecureHeadersConfig {
     const isDevelopment = isDev(env);
-    
+
     return {
         // Content Security Policy - strict by default
         contentSecurityPolicy: {
@@ -201,41 +201,41 @@ export function getSecureHeadersConfig(env: Env): SecureHeadersConfig {
             manifestSrc: ["'self'"],
             upgradeInsecureRequests: !isDevelopment ? [] : undefined
         },
-        
+
         // Strict Transport Security (HSTS)
-        strictTransportSecurity: isDevelopment 
+        strictTransportSecurity: isDevelopment
             ? undefined // Don't set in development
             : 'max-age=31536000; includeSubDomains; preload',
-        
+
         // X-Frame-Options - Prevent clickjacking
         xFrameOptions: 'DENY',
-        
+
         // X-Content-Type-Options - Prevent MIME sniffing
         xContentTypeOptions: 'nosniff',
-        
+
         // X-XSS-Protection - Legacy XSS protection
         xXssProtection: '1; mode=block',
-        
+
         // Referrer Policy - Privacy-focused
         referrerPolicy: 'strict-origin-when-cross-origin',
-        
+
         // Cross-Origin policies
         crossOriginEmbedderPolicy: 'require-corp',
         crossOriginResourcePolicy: 'same-origin',
         crossOriginOpenerPolicy: 'same-origin',
-        
+
         // Origin Agent Cluster
         originAgentCluster: '?1',
-        
+
         // X-DNS-Prefetch-Control
         xDnsPrefetchControl: 'off',
-        
+
         // X-Download-Options - IE specific
         xDownloadOptions: 'noopen',
-        
+
         // X-Permitted-Cross-Domain-Policies
         xPermittedCrossDomainPolicies: 'none',
-        
+
         // Permissions Policy - Feature restrictions
         permissionsPolicy: {
             camera: [],

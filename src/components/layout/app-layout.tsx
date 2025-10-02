@@ -14,7 +14,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const { pathname } = useLocation();
   return (
     <AppsDataProvider>
-      <SidebarProvider 
+      <SidebarProvider
         defaultOpen={false}
         style={{
           "--sidebar-width": "320px",

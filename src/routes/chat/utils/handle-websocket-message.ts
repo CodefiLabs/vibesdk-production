@@ -11,7 +11,7 @@ import {
     setAllFilesCompleted,
     updatePhaseFileStatus,
 } from './file-state-helpers';
-import { 
+import {
     createAIMessage,
     handleRateLimitError,
     handleStreamingMessage,
@@ -43,7 +43,7 @@ export interface HandleMessageDeps {
     setIsGenerationPaused: React.Dispatch<React.SetStateAction<boolean>>;
     setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>;
     setIsPhaseProgressActive: React.Dispatch<React.SetStateAction<boolean>>;
-    
+
     // Current state
     isInitialStateRestored: boolean;
     blueprint: BlueprintType | undefined;
@@ -55,7 +55,7 @@ export interface HandleMessageDeps {
     projectStages: any[];
     isGenerating: boolean;
     urlChatId: string | undefined;
-    
+
     // Functions
     updateStage: (stageId: string, updates: any) => void;
     sendMessage: (message: any) => void;
@@ -68,12 +68,12 @@ export interface HandleMessageDeps {
         messageType?: string,
         rawMessage?: unknown
     ) => void;
-    onTerminalMessage?: (log: { 
-        id: string; 
-        content: string; 
-        type: 'command' | 'stdout' | 'stderr' | 'info' | 'error' | 'warn' | 'debug'; 
-        timestamp: number; 
-        source?: string 
+    onTerminalMessage?: (log: {
+        id: string;
+        content: string;
+        type: 'command' | 'stdout' | 'stderr' | 'info' | 'error' | 'warn' | 'debug';
+        timestamp: number;
+        source?: string
     }) => void;
 }
 
@@ -119,7 +119,7 @@ export function createWebSocketMessageHandler(deps: HandleMessageDeps) {
         // Log messages except for frequent ones
         if (message.type !== 'file_chunk_generated' && message.type !== 'cf_agent_state' && message.type.length <= 50) {
             logger.info('received message', message.type, message);
-            onDebugMessage?.('websocket', 
+            onDebugMessage?.('websocket',
                 `${message.type}`,
                 JSON.stringify(message, null, 2),
                 'WebSocket',
@@ -127,7 +127,7 @@ export function createWebSocketMessageHandler(deps: HandleMessageDeps) {
                 message
             );
         }
-        
+
         switch (message.type) {
             case 'cf_agent_state': {
                 const { state } = message;
@@ -135,7 +135,7 @@ export function createWebSocketMessageHandler(deps: HandleMessageDeps) {
 
                 if (!isInitialStateRestored) {
                     logger.debug('📥 Performing initial state restoration');
-                    
+
                     if (state.blueprint && !blueprint) {
                         setBlueprint(state.blueprint);
                         updateStage('blueprint', { status: 'completed' });
@@ -212,13 +212,13 @@ export function createWebSocketMessageHandler(deps: HandleMessageDeps) {
                             setMessages(restoredMessages);
                         }
                     }
-                    
+
                     updateStage('bootstrap', { status: 'completed' });
-                    
+
                     if (state.blueprint) {
                         updateStage('blueprint', { status: 'completed' });
                     }
-                    
+
                     if (state.generatedFilesMap && Object.keys(state.generatedFilesMap).length > 0) {
                         updateStage('code', { status: 'completed' });
                         updateStage('validate', { status: 'completed' });
@@ -226,7 +226,7 @@ export function createWebSocketMessageHandler(deps: HandleMessageDeps) {
 
                     setIsInitialStateRestored(true);
 
-                    if (state.generatedFilesMap && Object.keys(state.generatedFilesMap).length > 0 && 
+                    if (state.generatedFilesMap && Object.keys(state.generatedFilesMap).length > 0 &&
                         urlChatId !== 'new') {
                         logger.debug('🚀 Requesting preview deployment for existing chat with files');
                         sendWebSocketMessage(websocket, 'preview');
@@ -236,7 +236,7 @@ export function createWebSocketMessageHandler(deps: HandleMessageDeps) {
                 if (state.shouldBeGenerating) {
                     logger.debug('🔄 shouldBeGenerating=true detected, auto-resuming generation');
                     updateStage('code', { status: 'active' });
-                    
+
                     logger.debug('📡 Sending auto-resume generate_all message');
                     sendWebSocketMessage(websocket, 'generate_all');
                 } else {
@@ -336,16 +336,16 @@ export function createWebSocketMessageHandler(deps: HandleMessageDeps) {
 
             case 'code_reviewed': {
                 const reviewData = message.review;
-                const totalIssues = reviewData?.filesToFix?.reduce((count: number, file: any) => 
+                const totalIssues = reviewData?.filesToFix?.reduce((count: number, file: any) =>
                     count + file.issues.length, 0) || 0;
-                
+
                 let reviewMessage = 'Code review complete';
                 if (reviewData?.issuesFound) {
                     reviewMessage = `Code review complete - ${totalIssues} issue${totalIssues !== 1 ? 's' : ''} found across ${reviewData.filesToFix?.length || 0} file${reviewData.filesToFix?.length !== 1 ? 's' : ''}`;
                 } else {
                     reviewMessage = 'Code review complete - no issues found';
                 }
-                
+
                 sendMessage({
                     id: 'code_review',
                     message: reviewMessage,
@@ -355,8 +355,8 @@ export function createWebSocketMessageHandler(deps: HandleMessageDeps) {
 
             case 'runtime_error_found': {
                 logger.info('Runtime error found in sandbox', message.errors);
-                
-                onDebugMessage?.('error', 
+
+                onDebugMessage?.('error',
                     `Runtime Error (${message.count} errors)`,
                     message.errors.map((e: any) => `${e.message}\nStack: ${e.stack || 'N/A'}`).join('\n\n'),
                     'Runtime Detection'
@@ -374,15 +374,15 @@ export function createWebSocketMessageHandler(deps: HandleMessageDeps) {
 
                 if (totalIssues > 0) {
                     updateStage('fix', { status: 'active', metadata: `Fixing ${totalIssues} issues` });
-                    
+
                     const errorDetails = [
                         `Lint Issues: ${JSON.stringify(message.staticAnalysis?.lint?.issues)}`,
                         `Type Errors: ${JSON.stringify(message.staticAnalysis?.typecheck?.issues)}`,
                         `Runtime Errors: ${JSON.stringify(message.runtimeErrors)}`,
                         `Client Errors: ${JSON.stringify(message.clientErrors)}`,
                     ].filter(Boolean).join('\n');
-                    
-                    onDebugMessage?.('warning', 
+
+                    onDebugMessage?.('warning',
                         `Generation Issues Found (${totalIssues} total)`,
                         errorDetails,
                         'Code Generation'
@@ -419,7 +419,7 @@ export function createWebSocketMessageHandler(deps: HandleMessageDeps) {
                     message: message.message,
                 });
                 updateStage('code', { status: 'active' });
-                
+
                 if (message.phase) {
                     setPhaseTimeline(prev => {
                         const existingPhase = prev.find(p => p.name === message.phase.name);
@@ -427,7 +427,7 @@ export function createWebSocketMessageHandler(deps: HandleMessageDeps) {
                             logger.debug('Phase already exists in timeline:', message.phase.name);
                             return prev;
                         }
-                        
+
                         const newPhase = {
                             id: `${message.phase.name}-${Date.now()}`,
                             name: message.phase.name,
@@ -440,7 +440,7 @@ export function createWebSocketMessageHandler(deps: HandleMessageDeps) {
                             status: 'generating' as const,
                             timestamp: Date.now()
                         };
-                        
+
                         logger.debug('Added new phase to timeline:', message.phase.name);
                         return [...prev, newPhase];
                     });
@@ -454,7 +454,7 @@ export function createWebSocketMessageHandler(deps: HandleMessageDeps) {
                     message: message.message,
                 });
                 updateStage('validate', { status: 'active' });
-                
+
                 setPhaseTimeline(prev => {
                     const updated = [...prev];
                     if (updated.length > 0) {
@@ -487,7 +487,7 @@ export function createWebSocketMessageHandler(deps: HandleMessageDeps) {
                 updateStage('code', { status: 'completed' });
                 setIsRedeployReady(true);
                 setIsPhaseProgressActive(false);
-                
+
                 if (message.phase) {
                     setPhaseTimeline(prev => {
                         const updated = [...prev];
@@ -505,11 +505,11 @@ export function createWebSocketMessageHandler(deps: HandleMessageDeps) {
                 setTimeout(() => {
                     logger.debug('🔄 Triggering preview refresh after deployment completion');
                     setShouldRefreshPreview(true);
-                    
+
                     setTimeout(() => {
                         setShouldRefreshPreview(false);
                     }, 100);
-                    
+
                     onDebugMessage?.('info',
                         'Preview Auto-Refresh Triggered',
                         `Preview refreshed 1 second after deployment completion`,
@@ -553,13 +553,13 @@ export function createWebSocketMessageHandler(deps: HandleMessageDeps) {
                 setCloudflareDeploymentUrl(message.deploymentUrl);
                 setDeploymentError('');
                 setIsRedeployReady(false);
-                
+
                 sendMessage({
                     id: 'cloudflare_deployment_completed',
                     message: `Your project has been permanently deployed to Cloudflare Workers: ${message.deploymentUrl}`,
                 });
-                
-                onDebugMessage?.('info', 
+
+                onDebugMessage?.('info',
                     'Deployment Completed - Redeploy Reset',
                     `Deployment URL: ${message.deploymentUrl}\nPhase count at deployment: ${phaseTimeline.length}\nRedeploy button disabled until next phase`,
                     'Redeployment Management'
@@ -572,15 +572,15 @@ export function createWebSocketMessageHandler(deps: HandleMessageDeps) {
                 setDeploymentError(message.error || 'Unknown deployment error');
                 setCloudflareDeploymentUrl('');
                 setIsRedeployReady(true);
-                
+
                 sendMessage({
                     id: 'cloudflare_deployment_error',
                     message: `❌ Deployment failed: ${message.error}\n\n🔄 You can try deploying again.`,
                 });
 
                 toast.error(`Error: ${message.error}`);
-                
-                onDebugMessage?.('error', 
+
+                onDebugMessage?.('error',
                     'Deployment Failed - State Reset',
                     `Error: ${message.error}\nDeployment button reset for retry`,
                     'Deployment Error Recovery'
@@ -619,7 +619,7 @@ export function createWebSocketMessageHandler(deps: HandleMessageDeps) {
                 });
 
                 toast.error(`Error: ${message.error}`);
-                
+
                 break;
             }
 
@@ -694,7 +694,7 @@ export function createWebSocketMessageHandler(deps: HandleMessageDeps) {
                     ...prev,
                     createAIMessage(`error_${Date.now()}`, `❌ ${errorData.error}`)
                 ]);
-                
+
                 onDebugMessage?.(
                     'error',
                     'WebSocket Error',
@@ -713,7 +713,7 @@ export function createWebSocketMessageHandler(deps: HandleMessageDeps) {
                     onDebugMessage
                 );
                 setMessages(prev => [...prev, rateLimitMessage]);
-                
+
                 break;
             }
 

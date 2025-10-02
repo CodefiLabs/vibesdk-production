@@ -10,7 +10,7 @@ const invocationUserCache = new Map<string, GlobalConfigurableSettings>();
 
 /**
  *  deep merge utility for configuration objects
- * 
+ *
  * Merge rules:
  * - undefined in source: use target value (default)
  * - null/empty array/empty string in source: use source value (intentional override)
@@ -46,26 +46,26 @@ function deepMerge<T>(
     if (source === null || source === undefined) {
         return target;
     }
-    
+
     // Handle non-object targets or sources
     if (!isPlainObject(target) || !isPlainObject(source)) {
         return (source !== undefined ? source : target) as T;
     }
-    
+
     // Safe type assertion after guard checks
     const targetObj = target as Record<string, MergeableValue>;
     const sourceObj = source as Record<string, unknown>;
     const result = { ...targetObj } as Record<string, MergeableValue>;
-    
+
     // Merge properties
     Object.entries(sourceObj).forEach(([key, sourceValue]) => {
         // Skip undefined - means "use default"
         if (sourceValue === undefined) {
             return;
         }
-        
+
         const targetValue = targetObj[key];
-        
+
         // Recursive merge for nested objects
         if (isPlainObject(sourceValue) && isPlainObject(targetValue)) {
             result[key] = deepMerge(targetValue, sourceValue);
@@ -74,7 +74,7 @@ function deepMerge<T>(
             result[key] = sourceValue as MergeableValue;
         }
     });
-    
+
     return result as T;
 }
 
@@ -104,26 +104,26 @@ export async function getGlobalConfigurableSettings(env: Env): Promise<GlobalCon
             changeLogs: ""
         }
     };
-    
+
     try {
         // Try to fetch override config from KV
         const storedConfigJson = await env.VibecoderStore.get(CONFIG_KEY);
-        
+
         if (!storedConfigJson) {
             // No stored config, use defaults
             return defaultConfig;
         }
-        
+
         // Parse stored configuration
         const storedConfig: StoredConfig = JSON.parse(storedConfigJson);
-        
+
         // Deep merge configurations (stored config overrides defaults)
         const mergedConfig = deepMerge<GlobalConfigurableSettings>(defaultConfig, storedConfig);
-        
+
         logger.info('Loaded configuration with overrides from KV', { storedConfig, mergedConfig });
         cachedConfig = mergedConfig;
         return mergedConfig;
-        
+
     } catch (error) {
         logger.error('Failed to load configuration from KV, using defaults', error);
         // On error, fallback to default configuration
@@ -145,26 +145,26 @@ export async function getUserConfigurableSettings(env: Env, userId: string): Pro
     try {
         // Try to fetch override config from KV
         const storedConfigJson = await env.VibecoderStore.get(`user_config:${userId}`);
-        
+
         if (!storedConfigJson) {
             // No stored config, use defaults
             return globalConfig;
         }
-        
+
         // Parse stored configuration
         const storedConfig: StoredConfig = JSON.parse(storedConfigJson);
-        
+
         // Deep merge configurations (stored config overrides defaults)
         const mergedConfig = deepMerge<GlobalConfigurableSettings>(globalConfig, storedConfig);
-        
+
         logger.info(`Loaded configuration with overrides from KV for user ${userId}`, { globalConfig, storedConfig, mergedConfig });
         invocationUserCache.set(userId, mergedConfig);
         return mergedConfig;
-        
+
     } catch (error) {
         logger.error(`Failed to load configuration from KV for user ${userId}, using defaults`, error);
         // On error, fallback to default configuration
         return globalConfig;
     }
 }
-    
+

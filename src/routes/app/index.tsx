@@ -657,7 +657,7 @@ export default function AppView() {
 											Delete App
 										</Button>
 									</>
-								) 
+								)
                                 : (
 									<>
 										{/*
@@ -718,8 +718,8 @@ export default function AppView() {
 				>
 					{/* Using proper TabsList and TabsTrigger components */}
 					<TabsList className="inline-flex h-auto w-fit items-center gap-0.5 bg-bg-2 dark:bg-bg-1 rounded-md p-0.5 border border-border-primary/30 ml-0">
-						<TabsTrigger 
-							value="preview" 
+						<TabsTrigger
+							value="preview"
 							className="px-3 py-1.5 rounded text-xs font-medium data-[state=active]:bg-bg-4 dark:data-[state=active]:bg-bg-3 data-[state=active]:text-text-primary data-[state=active]:shadow-sm"
 						>
 							<Eye className={cn(
@@ -728,8 +728,8 @@ export default function AppView() {
 							)} />
 							Preview
 						</TabsTrigger>
-						<TabsTrigger 
-							value="code" 
+						<TabsTrigger
+							value="code"
 							className="px-3 py-1.5 rounded text-xs font-medium data-[state=active]:bg-bg-4 dark:data-[state=active]:bg-bg-3 data-[state=active]:text-text-primary data-[state=active]:shadow-sm"
 						>
 							<Code2 className={cn(
@@ -738,8 +738,8 @@ export default function AppView() {
 							)} />
 							Code
 						</TabsTrigger>
-						<TabsTrigger 
-							value="prompt" 
+						<TabsTrigger
+							value="prompt"
 							className="px-3 py-1.5 rounded text-xs font-medium data-[state=active]:bg-bg-4 dark:data-[state=active]:bg-bg-3 data-[state=active]:text-text-primary data-[state=active]:shadow-sm"
 						>
 							<MessageSquare className={cn(
@@ -989,8 +989,8 @@ export default function AppView() {
 								) : (
 									<div className="flex items-center justify-center h-[400px]">
 										<p className="text-muted-foreground">
-											{app?.agentSummary === null 
-												? 'Loading code...' 
+											{app?.agentSummary === null
+												? 'Loading code...'
 												: 'No code has been generated yet.'
 											}
 										</p>
@@ -1027,7 +1027,7 @@ export default function AppView() {
 												</p>
 											</div>
 										</div>
-										
+
 										{/* Copy button */}
 										<div className="mt-4 flex justify-end">
 											<Button
@@ -1051,8 +1051,8 @@ export default function AppView() {
 									<div className="flex items-center justify-center py-12 text-text-tertiary">
 										<MessageSquare className="h-8 w-8 mr-3" />
 										<p>
-											{app?.agentSummary === null 
-												? 'Loading prompt...' 
+											{app?.agentSummary === null
+												? 'Loading prompt...'
 												: 'No prompt available'
 											}
 										</p>

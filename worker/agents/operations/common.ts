@@ -20,14 +20,14 @@ export function getSystemPromptWithProjectContext(
             blueprint,
             templateDetails,
             dependencies,
-        })), 
+        })),
         createUserMessage(
             USER_PROMPT_FORMATTER.PROJECT_CONTEXT(
                 context.getCompletedPhases(),
-                allFiles, 
+                allFiles,
                 context.getFileTree(),
                 commandsHistory,
-                serializerType  
+                serializerType
             )
         ),
         createAssistantMessage(`I have thoroughly gone through the whole codebase and understood the current implementation and project requirements. We can continue.`)

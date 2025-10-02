@@ -85,7 +85,7 @@ export async function getTemplateForQuery(
     }
 
     const sandboxSessionId = generateId();
-        
+
     const [analyzeQueryResponse, sandboxClient] = await Promise.all([
             selectTemplate({
                 env: env,
@@ -93,18 +93,18 @@ export async function getTemplateForQuery(
                 query,
                 availableTemplates: templatesResponse.templates,
                 images,
-            }), 
+            }),
             getSandboxService(sandboxSessionId)
         ]);
-        
+
         logger.info('Selected template', { selectedTemplate: analyzeQueryResponse });
-            
+
         // Find the selected template by name in the available templates
         if (!analyzeQueryResponse.selectedTemplateName) {
             logger.error('No suitable template found for code generation');
             throw new Error('No suitable template found for code generation');
         }
-            
+
         const selectedTemplate = templatesResponse.templates.find(template => template.name === analyzeQueryResponse.selectedTemplateName);
         if (!selectedTemplate) {
             logger.error('Selected template not found');
@@ -116,7 +116,7 @@ export async function getTemplateForQuery(
             logger.error('Failed to fetch files', { templateDetailsResponse });
             throw new Error('Failed to fetch files');
         }
-            
+
         const templateDetails = templateDetailsResponse.templateDetails;
         return { sandboxSessionId, templateDetails, selection: analyzeQueryResponse };
 }

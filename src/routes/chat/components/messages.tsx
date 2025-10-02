@@ -16,7 +16,7 @@ function sanitizeMessageForDisplay(message: string): string {
 
 export function UserMessage({ message }: { message: string }) {
 	const sanitizedMessage = sanitizeMessageForDisplay(message);
-	
+
 	return (
 		<div className="flex gap-3">
 			<div className="align-text-top pl-1">
@@ -42,7 +42,7 @@ export function AIMessage({
 	toolEvents?: ToolEvent[];
 }) {
 	const sanitizedMessage = sanitizeMessageForDisplay(message);
-	
+
 	return (
 		<div className="flex gap-3">
 			<div className="align-text-top pl-1">

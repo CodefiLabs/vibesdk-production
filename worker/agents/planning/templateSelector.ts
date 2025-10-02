@@ -27,12 +27,12 @@ export async function selectTemplate({ env, query, availableTemplates, inference
     }
 
     try {
-        logger.info("Asking AI to select a template", { 
-            query, 
+        logger.info("Asking AI to select a template", {
+            query,
             queryLength: query.length,
             imagesCount: images?.length || 0,
             availableTemplates: availableTemplates.map(t => t.name),
-            templateCount: availableTemplates.length 
+            templateCount: availableTemplates.length
         });
 
         const templateDescriptions = availableTemplates.map((t, index) =>
@@ -66,7 +66,7 @@ Reasoning: "Social template provides user interactions, content sharing, and com
 
 ## SELECTION CRITERIA:
 1. **Feature Alignment** - Templates with similar core functionality
-2. **Tech Stack Match** - Compatible frameworks and dependencies  
+2. **Tech Stack Match** - Compatible frameworks and dependencies
 3. **Architecture Fit** - Similar application structure and patterns
 4. **Minimal Modification** - Template requiring least changes
 

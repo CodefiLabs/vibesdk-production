@@ -15,7 +15,7 @@ RUN apt-get update && \
         curl -L -k --output cloudflared "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-${ARCH}" && \
         chmod +x cloudflared && \
         mv cloudflared /usr/local/bin/ && \
-        rm -rf /var/lib/apt/lists/* && \    
+        rm -rf /var/lib/apt/lists/* && \
         git config --global user.email "vibesdk-bot@cloudflare.com" && \
         git config --global user.name "Cloudflare Vibesdk bot"
 
@@ -45,7 +45,7 @@ RUN chmod 755 /app/data
 
 # Set environment variable to indicate Docker container environment
 ENV CONTAINER_ENV=docker
-ENV VITE_LOGGER_TYPE=json 
+ENV VITE_LOGGER_TYPE=json
 
 # Reset workdir
 WORKDIR /app

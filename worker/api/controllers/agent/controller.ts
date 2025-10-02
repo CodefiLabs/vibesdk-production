@@ -74,13 +74,13 @@ export class CodingAgentController extends BaseController {
 
             const agentId = generateId();
             const modelConfigService = new ModelConfigService(env);
-                                
+
             // Fetch all user model configs, api keys and agent instance at once
             const [userConfigsRecord, agentInstance] = await Promise.all([
                 modelConfigService.getUserModelConfigs(user.id),
                 getAgentStub(env, agentId, false, this.logger)
             ]);
-                                
+
             // Convert Record to Map and extract only ModelConfig properties
             const userModelConfigs = new Map();
             for (const [actionKey, mergedConfig] of Object.entries(userConfigsRecord)) {
@@ -102,7 +102,7 @@ export class CodingAgentController extends BaseController {
                 userId: user.id,
                 enableRealtimeCodeFix: true, // For now disabled from the model configs itself
             }
-                                
+
             this.logger.info(`Initialized inference context for user ${user.id}`, {
                 modelConfigsCount: Object.keys(userModelConfigs).length,
             });
@@ -111,7 +111,7 @@ export class CodingAgentController extends BaseController {
 
             const websocketUrl = `${url.protocol === 'https:' ? 'wss:' : 'ws:'}//${url.host}/api/agent/${agentId}/ws`;
             const httpStatusUrl = `${url.origin}/api/agent/${agentId}`;
-        
+
             writer.write({
                 message: 'Code generation started',
                 agentId: agentId,
@@ -143,7 +143,7 @@ export class CodingAgentController extends BaseController {
             });
 
             this.logger.info(`Agent ${agentId} init launched successfully`);
-            
+
             return new Response(readable, {
                 status: 200,
                 headers: {
@@ -182,7 +182,7 @@ export class CodingAgentController extends BaseController {
             if (request.headers.get('Upgrade') !== 'websocket') {
                 return new Response('Expected WebSocket upgrade', { status: 426 });
             }
-            
+
             // Validate WebSocket origin
             if (!validateWebSocketOrigin(request, env)) {
                 return new Response('Forbidden: Invalid origin', { status: 403 });
@@ -195,7 +195,7 @@ export class CodingAgentController extends BaseController {
             }
 
             this.logger.info(`WebSocket connection request for chat: ${chatId}`);
-            
+
             // Log request details for debugging
             const headers: Record<string, string> = {};
             request.headers.forEach((value, key) => {
@@ -210,7 +210,7 @@ export class CodingAgentController extends BaseController {
             try {
                 // Get the agent instance to handle the WebSocket connection
                 const agentInstance = await getAgentStub(env, chatId, true, this.logger);
-                
+
                 this.logger.info(`Successfully got agent instance for chat: ${chatId}`);
 
                 // Let the agent handle the WebSocket connection directly
@@ -303,7 +303,7 @@ export class CodingAgentController extends BaseController {
             try {
                 // Get the agent instance
                 const agentInstance = await getAgentStub(env, agentId, true, this.logger);
-                
+
                 // Deploy the preview
                 const preview = await agentInstance.deployToSandbox();
                 if (!preview) {

@@ -73,7 +73,7 @@ export function createMultiModalUserMessage(
 	content: (TextContent | ImageContent)[];
 } {
 	const urls = Array.isArray(imageUrls) ? imageUrls : [imageUrls];
-	
+
 	return {
 		role: 'user' as MessageRole,
 		content: [

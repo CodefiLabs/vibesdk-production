@@ -27,38 +27,38 @@
 
 ## ✨ What is Cloudflare VibeSDK?
 
-Cloudflare VibeSDK is an open source AI vibe coding platform built on Cloudflare's developer platform. If you're building an AI-powered platform for building applications, this is a great example that you can deploy and customize to build the whole platform yourself. Once the platform is deployed, users can say what they want to build in natural language, and the AI agent will create and deploy the application. 
+Cloudflare VibeSDK is an open source AI vibe coding platform built on Cloudflare's developer platform. If you're building an AI-powered platform for building applications, this is a great example that you can deploy and customize to build the whole platform yourself. Once the platform is deployed, users can say what they want to build in natural language, and the AI agent will create and deploy the application.
 
 **🌐 [Experience it live at build.cloudflare.dev](https://build.cloudflare.dev)** – Try it out before deploying your own instance!
 
 ## 🎯 Perfect For
 
 ### Companies building AI-powered platforms
-Run your own solution that allows users to build applications in natural language. Customize the AI behavior, control the generated code patterns, integrate your own component libraries, and keep all customer data within your infrastructure. Perfect for startups wanting to enter the AI development space or established companies adding AI capabilities to their existing developer tools.  
+Run your own solution that allows users to build applications in natural language. Customize the AI behavior, control the generated code patterns, integrate your own component libraries, and keep all customer data within your infrastructure. Perfect for startups wanting to enter the AI development space or established companies adding AI capabilities to their existing developer tools.
 
 ### Internal development
-Enable non-technical teams to create the tools they need without waiting for engineering resources. Marketing can build landing pages, sales can create custom dashboards, and operations can automate workflows, all by describing what they want. 
+Enable non-technical teams to create the tools they need without waiting for engineering resources. Marketing can build landing pages, sales can create custom dashboards, and operations can automate workflows, all by describing what they want.
 
-### SaaS platforms 
-Let your customers extend your product's functionality without learning your API or writing code. They can describe custom integrations, build specialized workflows, or create tailored interfaces specific to their business needs. 
+### SaaS platforms
+Let your customers extend your product's functionality without learning your API or writing code. They can describe custom integrations, build specialized workflows, or create tailored interfaces specific to their business needs.
 
 ---
 
 ### 🎯 Key Features
 
-🤖 **AI Code Generation** – Phase-wise development with intelligent error correction  
-⚡ **Live Previews** – App previews running in sandboxed containers  
-💬 **Interactive Chat** – Guide development through natural conversation  
-📱 **Modern Stack** – Generates React + TypeScript + Tailwind apps  
-🚀 **One-Click Deploy** – Deploy generated apps to Workers for Platforms  
-📦 **GitHub Integration** – Export code directly to your repositories  
+🤖 **AI Code Generation** – Phase-wise development with intelligent error correction
+⚡ **Live Previews** – App previews running in sandboxed containers
+💬 **Interactive Chat** – Guide development through natural conversation
+📱 **Modern Stack** – Generates React + TypeScript + Tailwind apps
+🚀 **One-Click Deploy** – Deploy generated apps to Workers for Platforms
+📦 **GitHub Integration** – Export code directly to your repositories
 
 ### 🏗️ Built on Cloudflare's Platform
 
 Cloudflare VibeSDK Build utilizes the full Cloudflare developer ecosystem:
 
 - **Frontend**: React + Vite with modern UI components
-- **Backend**: Workers with Durable Objects for AI agents  
+- **Backend**: Workers with Durable Objects for AI agents
 - **Database**: D1 (SQLite) with Drizzle ORM
 - **AI**: Multiple LLM providers via AI Gateway
 - **Containers**: Sandboxed app previews and execution
@@ -77,7 +77,7 @@ Before clicking "Deploy to Cloudflare", have these ready:
 ### 🔑 Required API Key
 - **Google Gemini API Key** - Get from [ai.google.dev](https://ai.google.dev)
 
-Once you click "Deploy to Cloudflare", you'll be taken to your Cloudflare dashboard where you can configure your VibeSDK deployment with these variables. 
+Once you click "Deploy to Cloudflare", you'll be taken to your Cloudflare dashboard where you can configure your VibeSDK deployment with these variables.
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/vibesdk)
 
@@ -108,15 +108,12 @@ VibeSDK uses Cloudflare Containers to run generated applications in isolated env
 
 #### Available Instance Types
 
-> **📢 Updated Oct 2025**: Cloudflare now offers [larger container instance types](https://developers.cloudflare.com/changelog/2025-10-01-new-container-instance-types/) with more resources!
-
 | Instance Type | Memory | CPU | Disk | Use Case | Availability |
 |---------------|--------|-----|------|----------|--------------|
-| `lite` (alias: `dev`) | 256 MiB | 1/16 vCPU | 2 GB | Development/testing | All plans |
-| `standard-1` (alias: `standard`) | 4 GiB | 1/2 vCPU | 8 GB | Light production apps | All plans |
-| `standard-2` | 8 GiB | 1 vCPU | 12 GB | Medium workloads | All plans |
-| `standard-3` | 12 GiB | 2 vCPU | 16 GB | Production apps | All plans (**Default**) |
-| `standard-4` | 12 GiB | 4 vCPU | 20 GB | High-performance apps | All plans |
+| `dev` | 256 MiB | 1/16 vCPU | 2 GB | Development/testing | All plans |
+| `basic` | 1 GiB | 1/4 vCPU | 4 GB | Light applications | All plans |
+| `standard` | 4 GiB | 1/2 vCPU | 4 GB | Most applications | All plans (**Default**) |
+| `enhanced` | 4 GiB | 4 vCPUs | 10 GB | High-performance apps | Enterprise customers only |
 
 #### Configuration Options
 
@@ -155,14 +152,14 @@ The `SANDBOX_INSTANCE_TYPE` controls:
 OAuth configuration is **not** shown on the initial deploy page. If you want user login features, you'll need to set this up after deployment:
 
 **How to Add OAuth After Deployment:**
-1. **Find your repository** in your GitHub/GitLab account (created by "Deploy to Cloudflare" flow) 
+1. **Find your repository** in your GitHub/GitLab account (created by "Deploy to Cloudflare" flow)
 2. **Clone locally** and run `bun install`
 3. **Create `.dev.vars` and `.prod.vars` files** (see below for OAuth configuration)
 4. **Run `bun run deploy`** to update your deployment
 
 **Google OAuth Setup:**
 1. [Google Cloud Console](https://console.cloud.google.com) → Create Project
-2. Enable **Google+ API** 
+2. Enable **Google+ API**
 3. Create **OAuth 2.0 Client ID**
 4. Add authorized origins: `https://your-custom-domain.`
 5. Add redirect URI: `https://your-worker-name.workers.dev/api/auth/callback/google`
@@ -230,7 +227,7 @@ Want to see these prompts in action? **[Visit the live demo at build.cloudflare.
 
 > "Make a memory card game with emojis"
 
-**📊 Productivity Apps**  
+**📊 Productivity Apps**
 > "Create an expense tracker with charts and categories"
 
 > "Build a pomodoro timer with task management"
@@ -240,7 +237,7 @@ Want to see these prompts in action? **[Visit the live demo at build.cloudflare.
 **🎨 Creative Tools**
 > "Build a color palette generator from images"
 
-> "Create a markdown editor with live preview"  
+> "Create a markdown editor with live preview"
 
 > "Make a meme generator with text overlays"
 
@@ -282,7 +279,7 @@ export default {
 Cloudflare VibeSDK generates apps in intelligent phases:
 
 1. **Planning Phase**: Analyzes requirements, creates file structure
-2. **Foundation Phase**: Generates package.json, basic setup files  
+2. **Foundation Phase**: Generates package.json, basic setup files
 3. **Core Phase**: Creates main components and logic
 4. **Styling Phase**: Adds CSS and visual design
 5. **Integration Phase**: Connects APIs and external services
@@ -397,7 +394,7 @@ Cloudflare VibeSDK implements enterprise-grade security:
 - If you see this error, try redeploying - permissions are auto-granted
 - Contact Cloudflare support if the issue persists
 
-**🤖 "AI Gateway Authentication Failed"**  
+**🤖 "AI Gateway Authentication Failed"**
 - Confirm AI Gateway is set to **Authenticated** mode
 - Verify the authentication token has **Run** permissions
 - Check that gateway URL format is correct
@@ -439,7 +436,7 @@ Cloudflare VibeSDK implements enterprise-grade security:
 Want to contribute to Cloudflare VibeSDK? Here's how:
 
 1. **🍴 Fork** via the Deploy button (creates your own instance!)
-2. **💻 Develop** new features or improvements  
+2. **💻 Develop** new features or improvements
 3. **✅ Test** thoroughly with `bun run test`
 4. **📤 Submit** Pull Request to the main repository
 
@@ -454,7 +451,7 @@ Want to contribute to Cloudflare VibeSDK? Here's how:
 - [R2](https://developers.cloudflare.com/r2/) - Object storage without egress fees
 - [AI Gateway](https://developers.cloudflare.com/ai-gateway/) - Unified AI API gateway
 
-### 💬 **Community**  
+### 💬 **Community**
 - [Discord](https://discord.gg/cloudflaredev) - Real-time chat and support
 - [Community Forum](https://community.cloudflare.com/) - Technical discussions
 - [GitHub Discussions](https://github.com/your-org/cloudflare-vibecoding-starter-kit/discussions) - Feature requests and ideas

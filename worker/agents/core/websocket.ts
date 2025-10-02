@@ -15,11 +15,11 @@ export function handleWebSocketMessage(agent: SimpleCodeGeneratorAgent, connecti
         switch (parsedMessage.type) {
             case WebSocketMessageRequests.GENERATE_ALL:
                 // Set shouldBeGenerating flag to indicate persistent intent
-                agent.setState({ 
-                    ...agent.state, 
-                    shouldBeGenerating: true 
+                agent.setState({
+                    ...agent.state,
+                    shouldBeGenerating: true
                 });
-                
+
                 // Check if generation is already active to avoid duplicate processes
                 if (agent.isGenerating) {
                     logger.info('Generation already in progress, skipping duplicate request');
@@ -28,7 +28,7 @@ export function handleWebSocketMessage(agent: SimpleCodeGeneratorAgent, connecti
                     // });
                     return;
                 }
-                
+
                 // Start generation process
                 logger.info('Starting code generation process');
                 agent.generateAllFiles().catch(error => {
@@ -38,9 +38,9 @@ export function handleWebSocketMessage(agent: SimpleCodeGeneratorAgent, connecti
                     // Only clear shouldBeGenerating on successful completion
                     // (errors might want to retry, so this could be handled differently)
                     if (!agent.isGenerating) {
-                        agent.setState({ 
-                            ...agent.state, 
-                            shouldBeGenerating: false 
+                        agent.setState({
+                            ...agent.state,
+                            shouldBeGenerating: false
                         });
                     }
                 });
@@ -122,15 +122,15 @@ export function handleWebSocketMessage(agent: SimpleCodeGeneratorAgent, connecti
             case WebSocketMessageRequests.STOP_GENERATION:
                 // Clear shouldBeGenerating flag when user manually stops
                 logger.info('Stopping code generation and clearing shouldBeGenerating flag');
-                agent.setState({ 
-                    ...agent.state, 
-                    shouldBeGenerating: false 
+                agent.setState({
+                    ...agent.state,
+                    shouldBeGenerating: false
                 });
-                
+
                 // If there's an active generation, we should signal it to stop
                 // (This depends on how the generation process is implemented)
                 agent.isGenerating = false;
-                
+
                 sendToConnection(connection, WebSocketMessageResponses.GENERATION_STOPPED, {
                     message: 'Code generation stopped by user'
                 });
@@ -138,11 +138,11 @@ export function handleWebSocketMessage(agent: SimpleCodeGeneratorAgent, connecti
             case WebSocketMessageRequests.RESUME_GENERATION:
                 // Set shouldBeGenerating and restart generation
                 logger.info('Resuming code generation');
-                agent.setState({ 
-                    ...agent.state, 
-                    shouldBeGenerating: true 
+                agent.setState({
+                    ...agent.state,
+                    shouldBeGenerating: true
                 });
-                
+
                 if (!agent.isGenerating) {
                     sendToConnection(connection, WebSocketMessageResponses.GENERATION_RESUMED, {
                         message: 'Code generation resumed'
@@ -172,19 +172,19 @@ export function handleWebSocketMessage(agent: SimpleCodeGeneratorAgent, connecti
                     hasImages: !!parsedMessage.images && parsedMessage.images.length > 0,
                     imageCount: parsedMessage.images?.length || 0
                 });
-                
+
                 if (!parsedMessage.message) {
                     sendError(connection, 'No message provided in user suggestion');
                     return;
                 }
-                
+
                 // Validate image count and size
                 if (parsedMessage.images && parsedMessage.images.length > 0) {
                     if (parsedMessage.images.length > MAX_IMAGES_PER_MESSAGE) {
                         sendError(connection, `Maximum ${MAX_IMAGES_PER_MESSAGE} images allowed per message. Received ${parsedMessage.images.length} images.`);
                         return;
                     }
-                    
+
                     // Validate each image size
                     for (const image of parsedMessage.images) {
                         if (image.size > MAX_IMAGE_SIZE_BYTES) {
@@ -193,7 +193,7 @@ export function handleWebSocketMessage(agent: SimpleCodeGeneratorAgent, connecti
                         }
                     }
                 }
-                
+
                 agent.handleUserInput(parsedMessage.message, parsedMessage.images).catch((error: unknown) => {
                     logger.error('Error handling user suggestion:', error);
                     sendError(connection, `Error processing user suggestion: ${error instanceof Error ? error.message : String(error)}`);
@@ -218,13 +218,13 @@ export function handleWebSocketMessage(agent: SimpleCodeGeneratorAgent, connecti
             //         command: parsedMessage.command,
             //         timestamp: parsedMessage.timestamp
             //     });
-                
+
             //     if (!parsedMessage.command) {
             //         sendError(connection, 'No command provided');
             //         return;
             //     }
-                
-            //     // Execute terminal command  
+
+            //     // Execute terminal command
             //     agent.executeTerminalCommand(parsedMessage.command, connection as any)
             //         .catch((error: unknown) => {
             //             logger.error('Error executing terminal command:', error);
@@ -260,8 +260,8 @@ export function broadcastToConnections<T extends WebSocketMessageType>(
 }
 
 export function sendToConnection<T extends WebSocketMessageType>(
-    connection: WebSocket, 
-    type: T, 
+    connection: WebSocket,
+    type: T,
     data: WebSocketMessageData<T>
 ): void {
     try {

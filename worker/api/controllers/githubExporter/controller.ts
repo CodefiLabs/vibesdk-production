@@ -53,7 +53,7 @@ export class GitHubExporterController extends BaseController {
             }
 
             let parsedState: GitHubOAuthCallbackState | null = null;
-            
+
             if (stateParam) {
                 try {
                     parsedState = JSON.parse(
@@ -80,7 +80,7 @@ export class GitHubExporterController extends BaseController {
 
             if (!tokenResult || !tokenResult.accessToken) {
                 this.logger.error('Failed to exchange OAuth code', { userId });
-                
+
                 return Response.redirect(
                     `${returnUrl}?github_export=error&reason=token_exchange_failed`,
                     302,

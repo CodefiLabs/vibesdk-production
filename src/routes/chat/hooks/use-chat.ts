@@ -22,7 +22,6 @@ import { sendWebSocketMessage } from '../utils/websocket-helpers';
 import { initialStages as defaultStages, updateStage as updateStageHelper } from '../utils/project-stage-helpers';
 import type { ProjectStage } from '../utils/project-stage-helpers';
 
-
 export interface FileType {
 	filePath: string;
 	fileContents: string;
@@ -101,10 +100,10 @@ export function useChat({
 	const [isDeploying, setIsDeploying] = useState(false);
 	const [cloudflareDeploymentUrl, setCloudflareDeploymentUrl] = useState<string>('');
 	const [deploymentError, setDeploymentError] = useState<string>();
-	
+
 	// Preview deployment state
 	const [isPreviewDeploying, setIsPreviewDeploying] = useState(false);
-	
+
 	// Redeployment state - tracks when redeploy button should be enabled
 	const [isRedeployReady, setIsRedeployReady] = useState(false);
 	// const [lastDeploymentPhaseCount, setLastDeploymentPhaseCount] = useState(0);
@@ -115,10 +114,10 @@ export function useChat({
 	const [isPhaseProgressActive, setIsPhaseProgressActive] = useState(false);
 
 	const [isThinking, setIsThinking] = useState(false);
-	
+
 	// Preview refresh state - triggers preview reload after deployment
 	const [shouldRefreshPreview, setShouldRefreshPreview] = useState(false);
-	
+
 	// Track whether we've completed initial state restoration to avoid disrupting active sessions
 	const [isInitialStateRestored, setIsInitialStateRestored] = useState(false);
 
@@ -226,7 +225,7 @@ export function useChat({
 			{ disableGenerate = false, isRetry = false }: { disableGenerate?: boolean; isRetry?: boolean } = {},
 		) => {
 			logger.debug(`🔌 ${isRetry ? 'Retrying' : 'Attempting'} WebSocket connection (attempt ${retryCount.current + 1}/${maxRetries + 1}):`, wsUrl);
-			
+
 			if (!wsUrl) {
 				logger.error('❌ WebSocket URL is required');
 				return;
@@ -260,14 +259,14 @@ export function useChat({
 						return;
 					}
 					if (myAttemptId !== connectAttemptIdRef.current) return;
-					
+
 					clearTimeout(connectionTimeout);
 					logger.info('✅ WebSocket connection established successfully!');
 					connectionStatus.current = 'connected';
-					
+
 					// Reset retry count on successful connection
 					retryCount.current = 0;
-					
+
 					// Clear any pending retry timeouts
 					retryTimeouts.current.forEach(clearTimeout);
 					retryTimeouts.current = [];
@@ -335,14 +334,14 @@ export function useChat({
 	const handleConnectionFailure = useCallback(
 		(wsUrl: string, disableGenerate: boolean, reason: string) => {
 			connectionStatus.current = 'failed';
-			
+
 			if (retryCount.current >= maxRetries) {
 				logger.error(`💥 WebSocket connection failed permanently after ${maxRetries + 1} attempts`);
 				sendMessage({
 					id: 'websocket_failed',
 					message: `🚨 Connection failed permanently after ${maxRetries + 1} attempts.\n\n❌ Reason: ${reason}\n\n🔄 Please refresh the page to try again.`,
 				});
-				
+
 				// Debug logging for permanent failure
 				onDebugMessage?.('error',
 					'WebSocket Connection Failed Permanently',
@@ -353,14 +352,14 @@ export function useChat({
 			}
 
 			retryCount.current++;
-			
+
 			// Exponential backoff: 2^attempt * 1000ms (1s, 2s, 4s, 8s, 16s)
 			const retryDelay = Math.pow(2, retryCount.current) * 1000;
 			const maxDelay = 30000; // Cap at 30 seconds
 			const actualDelay = Math.min(retryDelay, maxDelay);
 
 			logger.warn(`🔄 Retrying WebSocket connection in ${actualDelay / 1000}s (attempt ${retryCount.current + 1}/${maxRetries + 1})`);
-			
+
 			sendMessage({
 				id: 'websocket_retrying',
 				message: `🔄 Connection failed. Retrying in ${Math.ceil(actualDelay / 1000)} seconds... (attempt ${retryCount.current + 1}/${maxRetries + 1})\n\n❌ Reason: ${reason}`,
@@ -370,9 +369,9 @@ export function useChat({
 			const timeoutId = setTimeout(() => {
 				connectWithRetry(wsUrl, { disableGenerate, isRetry: true });
 			}, actualDelay);
-			
+
 			retryTimeouts.current.push(timeoutId);
-			
+
 			// Debug logging for retry attempt
 			onDebugMessage?.('warning',
 				'WebSocket Connection Retry',
@@ -451,7 +450,7 @@ export function useChat({
 							} catch (e) {
 								logger.error('Error parsing JSON:', e, obj.chunk);
 							}
-						} 
+						}
 						if (obj.agentId) {
 							result.agentId = obj.agentId;
 						}
@@ -481,7 +480,7 @@ export function useChat({
 					logger.debug('connecting to ws with created id');
 					connectWithRetry(result.websocketUrl);
 					setChatId(result.agentId); // This comes from the server response
-					
+
 					// Emit app-created event for sidebar updates
 					appEvents.emitAppCreated(result.agentId, {
 						title: userQuery || 'New App',
@@ -579,49 +578,49 @@ export function useChat({
 			// Send deployment command via WebSocket instead of HTTP request
 			if (sendWebSocketMessage(websocket, 'deploy', { instanceId })) {
 				logger.debug('🚀 Deployment WebSocket message sent:', instanceId);
-				
+
 				// Set 1-minute timeout for deployment
 				setTimeout(() => {
 					if (isDeploying) {
 						logger.warn('⏰ Deployment timeout after 1 minute');
-						
+
 						// Reset deployment state
 						setIsDeploying(false);
 						setCloudflareDeploymentUrl('');
 						setIsRedeployReady(false);
-						
+
 						// Show timeout message
 						sendMessage({
 							id: 'deployment_timeout',
 							message: `⏰ Deployment timed out after 1 minute.\n\n🔄 Please try deploying again. The server may be busy.`,
 						});
-						
+
 						// Debug logging for timeout
-						onDebugMessage?.('warning', 
+						onDebugMessage?.('warning',
 							'Deployment Timeout',
 							`Deployment for ${instanceId} timed out after 60 seconds`,
 							'Deployment Timeout Management'
 						);
 					}
 				}, 60000); // 1 minute = 60,000ms
-				
+
 				// Store timeout ID for cleanup if deployment completes early
 				// Note: In a real implementation, you'd want to clear this timeout
 				// when deployment completes successfully
-				
+
 			} else {
 				throw new Error('WebSocket connection not available');
 			}
 		} catch (error) {
 			logger.error('❌ Error sending deployment WebSocket message:', error);
-			
+
 			// Set deployment state immediately for UI feedback
 			setIsDeploying(true);
 			// Clear any previous deployment error
 			setDeploymentError('');
 			setCloudflareDeploymentUrl('');
 			setIsRedeployReady(false);
-			
+
 			sendMessage({
 				id: 'deployment_error',
 				message: `❌ Failed to initiate deployment: ${error instanceof Error ? error.message : 'Unknown error'}\n\n🔄 You can try again.`,

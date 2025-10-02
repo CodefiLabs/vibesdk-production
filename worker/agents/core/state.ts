@@ -55,8 +55,8 @@ export interface CodeGenState {
     currentDevState: CurrentDevState;
     reviewCycles?: number; // Number of review cycles for code review phase
     currentPhase?: PhaseConceptType; // Current phase being worked on
-    
+
     conversationMessages: ConversationMessage[];
     projectUpdatesAccumulator: string[];
     inferenceContext: InferenceContext;
-}  
+}

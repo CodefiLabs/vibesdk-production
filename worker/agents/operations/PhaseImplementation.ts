@@ -40,7 +40,7 @@ export const SYSTEM_PROMPT = `<ROLE>
 
 <GOAL>
     **Primary Objective:** Build fully functional, production-ready web applications in phases following architect-designed specifications.
-    
+
     **Implementation Process:**
     1. **ANALYZE** current codebase snapshot and identify what needs to be built
     2. **PRIORITIZE** critical runtime errors that must be fixed first (render loops, undefined errors)
@@ -51,7 +51,7 @@ export const SYSTEM_PROMPT = `<ROLE>
        - **User Experience**: Intuitive navigation, clear feedback, delightful interactions
        - **Supreme software development practices**: Follow the best coding principles and practices, and lay out the codebase in a way that is easy to maintain, extend and debug.
     4. **VALIDATE** that implementation is deployable, error-free, AND visually stunning
-    
+
     **Success Criteria:**
     - Application is demoable, deployable, AND visually impressive after this phase
     - Zero runtime errors or deployment-blocking issues. All issues from previous phases are also fixed.
@@ -59,13 +59,13 @@ export const SYSTEM_PROMPT = `<ROLE>
     - Code meets Cloudflare's highest standards for robustness, performance, AND visual excellence
     - Users are delighted by the interface design and smooth interactions
     - Every UI element demonstrates professional-grade visual polish
-    
+
     **One-Shot Implementation:** You have only one attempt to implement this phase successfully. Quality and reliability are paramount.
 </GOAL>
 
 <CONTEXT>
     •   You MUST adhere to the <BLUEPRINT> and the <CURRENT_PHASE> provided to implement the current phase. It is your primary specification.
-    •   The project was started based on our standard boilerplate template. It comes preconfigured with certain components preinstalled. 
+    •   The project was started based on our standard boilerplate template. It comes preconfigured with certain components preinstalled.
     •   You will be provided with all of the current project code. Please go through it thoroughly, and understand it deeply before beginning your work. Use the components, utilities and APIs provided in the project.
     •   Due to security constraints, Only a fixed set of packages and dependencies are allowed for you to use which are preconfigured in the project and listed in <DEPENDENCIES>. Verify every import statement against them before using them.
     •   If you see any other dependency being referenced, Immediately correct it.
@@ -148,7 +148,7 @@ const USER_PROMPT = `**Phase Implementation**
 <INSTRUCTIONS & CODE QUALITY STANDARDS>
 These are the instructions and quality standards that must be followed to implement this phase.
 **CRITICAL ERROR PREVENTION (Fix These First):**
-    
+
     1. **React Render Loop Prevention** - HIGHEST PRIORITY
         - Never call setState during render phase
         - Always use dependency arrays in useEffect
@@ -162,30 +162,30 @@ These are the instructions and quality standards that must be followed to implem
             Pattern 1: const { a, b } = useStore(s => ({ a: s.a, b: s.b }))  // Object literal.  NO useShallow = CRASH
             Pattern 2: const { a, b } = useStore()  // NO SELECTOR = returns whole state
             Pattern 3: const state = useStore(); const { a, b } = state;  // Destructure after
-        
-        For example, 
+
+        For example,
         // This works fine in regular React:
         const { user, isLoading } = useContext(UserContext);
 
         // But this is not:
         const { vfs, loading } = useVFSStore();  // ❌ WRONG!
         // Zustand is subscription-based, not context-based!
-          
+
         **Default to Option 1 when unsure. Option 2 requires useShallow import.**
         **Destructuring from a returned object creates NEW references every render = loop**
         - Avoid unconditional setState in useEffect
         - Stabilize object/array references with useMemo/useCallback
-    
+
     2. **Variable Declaration Order** - CRITICAL
        - Declare/import ALL variables before use
        - Avoid Temporal Dead Zone (TDZ) errors
        - Check function hoisting rules
-    
+
     3. **Import Validation** - DEPLOYMENT BLOCKER
        - Verify all imports against <DEPENDENCIES>
        - Check file paths are correct (existing files or generating in this phase)
        - Ensure named vs default import syntax is correct
-    
+
     4. **Runtime Error Prevention**
        - Add null checks before property access (user?.name)
        - Validate array length before element access
@@ -242,10 +242,10 @@ These are the instructions and quality standards that must be followed to implem
     7. Type Safety: Prefer proper types over casting (avoid misuse of \`as\`)
     - ✅ Correct: Fix object shape to match type
       const node: VFSFolder = { id, type: 'folder', name, parentId, children: [] };
-    
+
     - ⚠️ Use sparingly: \`as\` for DOM elements or explicit type narrowing
       const input = event.target as HTMLInputElement;
-    
+
     - ❌ Wrong: Forcing incompatible types (missing required fields)
       const node = { id, type: 'folder', name } as VFSFolder; // Missing children!
 
@@ -283,7 +283,7 @@ These are the instructions and quality standards that must be followed to implem
     •   **Dependency Verification:** **ONLY** use libraries specified in <DEPENDENCIES>. No other libraries are allowed or exist.
     •   **Performance:** Write efficient code. Avoid unnecessary computations or re-renders.
     •   **Styling:** Use the specified CSS approach consistently (e.g., CSS Modules, Tailwind). Ensure class names match CSS definitions.
-    •   **BUG FREE CODE:** Write good quality bug free code of the highest standards. Ensure all syntax is correct and all imports are valid. 
+    •   **BUG FREE CODE:** Write good quality bug free code of the highest standards. Ensure all syntax is correct and all imports are valid.
     •   **Please thoroughly review the tailwind.config.js file and existing styling CSS files, and make sure you use only valid defined Tailwind classes in your CSS. Using a class that is not defined in tailwind.config.js will lead to a crash which is very bad.**
     •   **Ensure there are no syntax errors or typos such as \`border-border\` (undefined) in tailwind instead of \`border\` (real class)**
     •   **You are not permitted to directly interfere or overwrite any of the core config files such as package.json, linting configs, tsconfig etc. except some exceptions**
@@ -302,7 +302,7 @@ These are the instructions and quality standards that must be followed to implem
         - ✅ Perfect responsive behavior that looks intentional at all screen sizes
         - ✅ Accessible design with proper contrast and semantic elements
     •   **Follow DRY principles by heart. Always research and understand the codebase before making changes. Understand the patterns used in the codebase. Do more in less code, be efficient with code**
-    •   Make sure every component, variable, function, class, and type is defined before it is used. 
+    •   Make sure every component, variable, function, class, and type is defined before it is used.
     •   Make sure everything that is needed is exported correctly from relevant files. Do not put duplicate 'default' exports.
     •   You may need to rewrite a file from a *previous* phase *if* you identify a critical issue or runtime errors in it.
     •   If any previous phase files were not made correctly or were corrupt, You shall also rewrite them in this phase. You are to ensure that the entire codebase is correct and working as expected.
@@ -355,7 +355,7 @@ const filter = useStore(s => s.filter);
 const items = useMemo(() => allItems.filter(i => i.status === filter), [allItems, filter]);
 \`\`\`
 
-⚠️  **BACKWARD COMPATIBILITY** - PRESERVE EXISTING FUNCTIONALITY  
+⚠️  **BACKWARD COMPATIBILITY** - PRESERVE EXISTING FUNCTIONALITY
 - Do NOT break anything from previous phases
 - Maintain all existing features and functionality
 - Test mentally that previous phase components still work
@@ -393,7 +393,7 @@ ${PROMPT_UTILS.COMMON_DEP_DOCUMENTATION}
 //  */
 // \`\`\`
 
-const LAST_PHASE_PROMPT = `Finalization and Review phase. 
+const LAST_PHASE_PROMPT = `Finalization and Review phase.
 Goal: Thoroughly review the entire codebase generated in previous phases. Identify and fix any remaining critical issues (runtime errors, logic flaws, rendering bugs) before deployment.
 ** YOU MUST HALT AFTER THIS PHASE **
 
@@ -472,16 +472,16 @@ The README should be professional, well-structured, and provide clear instructio
 - Use professional tone suitable for open source projects
 </INSTRUCTIONS>
 
-Generate the complete README.md content in markdown format. 
-Do not provide any additional text or explanation. 
-All your output will be directly saved in the README.md file. 
+Generate the complete README.md content in markdown format.
+Do not provide any additional text or explanation.
+All your output will be directly saved in the README.md file.
 Do not provide and markdown fence \`\`\` \`\`\` around the content either! Just pure raw markdown content!`;
 
 const formatUserSuggestions = (suggestions?: string[] | null): string => {
     if (!suggestions || suggestions.length === 0) {
         return '';
     }
-    
+
     return `
 <USER SUGGESTIONS>
 The following client suggestions and feedback have been provided, relayed by our client conversation agent.
@@ -504,7 +504,7 @@ const userPromptFormatter = (phaseConcept: PhaseConceptType, issues: IssueReport
         phaseConcept,
         PhaseConceptSchema
     );
-    
+
     const prompt = PROMPT_UTILS.replaceTemplateVariables(specialPhasePromptOverrides[phaseConcept.name] || USER_PROMPT, {
         phaseText,
         issues: issuesPromptFormatter(issues),
@@ -520,14 +520,14 @@ export class PhaseImplementationOperation extends AgentOperation<PhaseImplementa
     ): Promise<PhaseImplementationOutputs> {
         const { phase, issues, userContext } = inputs;
         const { env, logger, context } = options;
-        
+
         logger.info(`Generating files for phase: ${phase.name}`, phase.description, "files:", phase.files.map(f => f.path));
-    
+
         // Notify phase start
         const codeGenerationFormat = new SCOFFormat();
         // Build messages for generation
         const messages = getSystemPromptWithProjectContext(SYSTEM_PROMPT, context, CodeSerializerType.SCOF);
-        
+
         // Create user message with optional images
         const userPrompt = userPromptFormatter(phase, issues, userContext?.suggestions) + codeGenerationFormat.formatInstructions();
         const userMessage = userContext?.images && userContext.images.length > 0
@@ -537,16 +537,16 @@ export class PhaseImplementationOperation extends AgentOperation<PhaseImplementa
                 'high'
             )
             : createUserMessage(userPrompt);
-        
+
         messages.push(userMessage);
-    
+
         // Initialize streaming state
         const streamingState: CodeGenerationStreamingState = {
             accumulator: '',
             completedFiles: new Map(),
             parsingState: {} as SCOFParsingState
         };
-    
+
         const fixedFilePromises: Promise<FileOutputType>[] = [];
 
         let modelConfig = AGENT_CONFIG.phaseImplementation;
@@ -555,7 +555,7 @@ export class PhaseImplementationOperation extends AgentOperation<PhaseImplementa
         }
 
         const shouldEnableRealtimeCodeFixer = inputs.shouldAutoFix && IsRealtimeCodeFixerEnabled(options.inferenceContext);
-    
+
         // Execute inference with streaming
         await executeInference({
             env: env,
@@ -586,7 +586,7 @@ export class PhaseImplementationOperation extends AgentOperation<PhaseImplementa
                                 logger.error(`Completed file not found: ${filePath}`);
                                 return;
                             }
-    
+
                             // Process the file contents
                             const originalContents = context.allFiles.find(f => f.filePath === filePath)?.fileContents || '';
                             completedFile.fileContents = FileProcessing.processGeneratedFileContents(
@@ -594,12 +594,12 @@ export class PhaseImplementationOperation extends AgentOperation<PhaseImplementa
                                 originalContents,
                                 logger
                             );
-    
+
                             const generatedFile: FileOutputType = {
                                 ...completedFile,
                                 filePurpose: FileProcessing.findFilePurpose(
-                                    filePath, 
-                                    phase, 
+                                    filePath,
+                                    phase,
                                     context.allFiles.reduce((acc, f) => ({ ...acc, [f.filePath]: f }), {})
                                 )
                             };
@@ -608,7 +608,7 @@ export class PhaseImplementationOperation extends AgentOperation<PhaseImplementa
                                 // Call realtime code fixer immediately - this is the "realtime" aspect
                                 const realtimeCodeFixer = new RealtimeCodeFixer(env, options.inferenceContext);
                                 const fixPromise = realtimeCodeFixer.run(
-                                    generatedFile, 
+                                    generatedFile,
                                     {
                                         // previousFiles: previousFiles,
                                         query: context.query,
@@ -620,7 +620,7 @@ export class PhaseImplementationOperation extends AgentOperation<PhaseImplementa
                             } else {
                                 fixedFilePromises.push(Promise.resolve(generatedFile));
                             }
-    
+
                             inputs.fileClosedCallback(generatedFile, `Completed generation of ${filePath}`);
                         }
                     );
@@ -633,7 +633,7 @@ export class PhaseImplementationOperation extends AgentOperation<PhaseImplementa
         const commands = streamingState.parsingState.extractedInstallCommands;
 
         logger.info("Files generated for phase:", phase.name, "with", fixedFilePromises.length, "files being fixed in real-time and extracted install commands:", commands);
-    
+
         // Return generated files for validation and deployment
         return {
             fixedFilePromises,

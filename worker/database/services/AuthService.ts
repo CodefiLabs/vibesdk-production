@@ -12,14 +12,14 @@ import { PasswordService } from '../../utils/passwordService';
 import { GoogleOAuthProvider } from '../../services/oauth/google';
 import { GitHubOAuthProvider } from '../../services/oauth/github';
 import { BaseOAuthProvider } from '../../services/oauth/base';
-import { 
-    SecurityError, 
-    SecurityErrorType 
+import {
+    SecurityError,
+    SecurityErrorType
 } from 'shared/types/errors';
 import { AuthResult, AuthUserSession, OAuthUserInfo } from '../../types/auth-types';
 import { generateId } from '../../utils/idGenerator';
 import {
-    AuthUser, 
+    AuthUser,
     OAuthProvider
 } from '../../types/auth-types';
 import { mapUserResponse } from '../../utils/authUtils';
@@ -54,7 +54,7 @@ export interface RegistrationData {
 export class AuthService extends BaseService {
     private readonly sessionService: SessionService;
     private readonly passwordService: PasswordService;
-    
+
     constructor(
         env: Env,
     ) {
@@ -62,7 +62,7 @@ export class AuthService extends BaseService {
         this.sessionService = new SessionService(env);
         this.passwordService = new PasswordService();
     }
-    
+
     /**
      * Register a new user
      */
@@ -77,7 +77,7 @@ export class AuthService extends BaseService {
                     400
                 );
             }
-            
+
             // Validate password using centralized utility
             const passwordValidation = validatePassword(data.password, undefined, {
                 email: data.email,
@@ -90,14 +90,14 @@ export class AuthService extends BaseService {
                     400
                 );
             }
-            
+
             // Check if user already exists
             const existingUser = await this.database
                 .select()
                 .from(schema.users)
                 .where(eq(schema.users.email, data.email.toLowerCase()))
                 .get();
-            
+
             if (existingUser) {
                 throw new SecurityError(
                     SecurityErrorType.INVALID_INPUT,
@@ -105,14 +105,14 @@ export class AuthService extends BaseService {
                     400
                 );
             }
-            
+
             // Hash password
             const passwordHash = await this.passwordService.hash(data.password);
-            
+
             // Create user
             const userId = generateId();
             const now = new Date();
-            
+
             // Store user as verified immediately (no OTP verification required)
             await this.database.insert(schema.users).values({
                 id: userId,
@@ -125,14 +125,14 @@ export class AuthService extends BaseService {
                 createdAt: now,
                 updatedAt: now
             });
-            
+
             // Get the created user
             const newUser = await this.database
                 .select()
                 .from(schema.users)
                 .where(eq(schema.users.id, userId))
                 .get();
-            
+
             if (!newUser) {
                 throw new SecurityError(
                     SecurityErrorType.INVALID_INPUT,
@@ -140,17 +140,17 @@ export class AuthService extends BaseService {
                     500
                 );
             }
-            
+
             // Log successful registration
             await this.logAuthAttempt(data.email, 'register', true, request);
             logger.info('User registered and logged in directly', { userId, email: data.email });
-            
+
             // Create session and tokens immediately (log user in after registration)
             const { accessToken, session } = await this.sessionService.createSession(
                 userId,
                 request
             );
-            
+
             return {
                 user: mapUserResponse(newUser),
                 sessionId: session.sessionId,
@@ -159,11 +159,11 @@ export class AuthService extends BaseService {
             };
         } catch (error) {
             await this.logAuthAttempt(data.email, 'register', false, request);
-            
+
             if (error instanceof SecurityError) {
                 throw error;
             }
-            
+
             logger.error('Registration error', error);
             throw new SecurityError(
                 SecurityErrorType.INVALID_INPUT,
@@ -172,7 +172,7 @@ export class AuthService extends BaseService {
             );
         }
     }
-    
+
     /**
      * Login with email and password
      */
@@ -189,7 +189,7 @@ export class AuthService extends BaseService {
                     )
                 )
                 .get();
-            
+
             if (!user || !user.passwordHash) {
                 await this.logAuthAttempt(credentials.email, 'login', false, request);
                 throw new SecurityError(
@@ -198,13 +198,13 @@ export class AuthService extends BaseService {
                     401
                 );
             }
-            
+
             // Verify password
             const passwordValid = await this.passwordService.verify(
                 credentials.password,
                 user.passwordHash
             );
-            
+
             if (!passwordValid) {
                 await this.logAuthAttempt(credentials.email, 'login', false, request);
                 throw new SecurityError(
@@ -213,18 +213,18 @@ export class AuthService extends BaseService {
                     401
                 );
             }
-            
+
             // Create session
             const { accessToken, session } = await this.sessionService.createSession(
                 user.id,
                 request
             );
-            
+
             // Log successful attempt
             await this.logAuthAttempt(credentials.email, 'login', true, request);
-            
+
             logger.info('User logged in', { userId: user.id, email: user.email });
-            
+
             return {
                 user: mapUserResponse(user),
                 accessToken,
@@ -235,7 +235,7 @@ export class AuthService extends BaseService {
             if (error instanceof SecurityError) {
                 throw error;
             }
-            
+
             logger.error('Login error', error);
             throw new SecurityError(
                 SecurityErrorType.UNAUTHORIZED,
@@ -244,7 +244,7 @@ export class AuthService extends BaseService {
             );
         }
     }
-    
+
     /**
      * Logout
      */
@@ -264,7 +264,7 @@ export class AuthService extends BaseService {
 
     async getOauthProvider(provider: OAuthProvider, request: Request): Promise<BaseOAuthProvider> {
         const url = new URL(request.url).origin;
-        
+
         switch (provider) {
             case 'google':
                 return GoogleOAuthProvider.create(this.env, url);
@@ -278,7 +278,7 @@ export class AuthService extends BaseService {
                 );
         }
     }
-    
+
     /**
      * Get OAuth authorization URL
      */
@@ -295,22 +295,22 @@ export class AuthService extends BaseService {
                 400
             );
         }
-        
+
         // Clean up expired OAuth states first
         await this.cleanupExpiredOAuthStates();
-        
+
         // Validate and sanitize intended redirect URL
         let validatedRedirectUrl: string | null = null;
         if (intendedRedirectUrl) {
             validatedRedirectUrl = this.validateRedirectUrl(intendedRedirectUrl, request);
         }
-        
+
         // Generate state for CSRF protection
         const state = generateSecureToken();
-        
+
         // Generate PKCE code verifier
         const codeVerifier = BaseOAuthProvider.generateCodeVerifier();
-        
+
         // Store OAuth state with intended redirect URL
         await this.database.insert(schema.oauthStates).values({
             id: generateId(),
@@ -325,15 +325,15 @@ export class AuthService extends BaseService {
             userId: null,
             nonce: null
         });
-        
+
         // Get authorization URL
         const authUrl = await oauthProvider.getAuthorizationUrl(state, codeVerifier);
-        
+
         logger.info('OAuth authorization initiated', { provider });
-        
+
         return authUrl;
     }
-    
+
     /**
      * Clean up expired OAuth states
      */
@@ -348,13 +348,13 @@ export class AuthService extends BaseService {
                         eq(schema.oauthStates.isUsed, true)
                     )
                 );
-            
+
             logger.debug('Cleaned up expired OAuth states');
         } catch (error) {
             logger.error('Error cleaning up OAuth states', error);
         }
     }
-    
+
     /**
      * Handle OAuth callback
      */
@@ -373,7 +373,7 @@ export class AuthService extends BaseService {
                     400
                 );
             }
-            
+
             // Verify state
             const now = new Date();
             const oauthState = await this.database
@@ -387,7 +387,7 @@ export class AuthService extends BaseService {
                     )
                 )
                 .get();
-            
+
             if (!oauthState || new Date(oauthState.expiresAt) < now) {
                 throw new SecurityError(
                     SecurityErrorType.CSRF_VIOLATION,
@@ -395,36 +395,36 @@ export class AuthService extends BaseService {
                     400
                 );
             }
-            
+
             // Mark state as used
             await this.database
                 .update(schema.oauthStates)
                 .set({ isUsed: true })
                 .where(eq(schema.oauthStates.id, oauthState.id));
-            
+
             // Exchange code for tokens
             const tokens = await oauthProvider.exchangeCodeForTokens(
                 code,
                 oauthState.codeVerifier || undefined
             );
-            
+
             // Get user info
             const oauthUserInfo = await oauthProvider.getUserInfo(tokens.accessToken);
-            
+
             // Find or create user
             const user = await this.findOrCreateOAuthUser(provider, oauthUserInfo);
-            
+
             // Create session
             const { accessToken: sessionAccessToken, session } = await this.sessionService.createSession(
                 user.id,
                 request
             );
-            
+
             // Log auth attempt
             await this.logAuthAttempt(user.email, `oauth_${provider}`, true, request);
-            
+
             logger.info('OAuth login successful', { userId: user.id, provider });
-            
+
             return {
                 user: mapUserResponse(user),
                 accessToken: sessionAccessToken,
@@ -434,11 +434,11 @@ export class AuthService extends BaseService {
             };
         } catch (error) {
             await this.logAuthAttempt('', `oauth_${provider}`, false, request);
-            
+
             if (error instanceof SecurityError) {
                 throw error;
             }
-            
+
             logger.error('OAuth callback error', error);
             throw new SecurityError(
                 SecurityErrorType.UNAUTHORIZED,
@@ -447,7 +447,7 @@ export class AuthService extends BaseService {
             );
         }
     }
-    
+
     /**
      * Find or create OAuth user
      */
@@ -461,12 +461,12 @@ export class AuthService extends BaseService {
             .from(schema.users)
             .where(eq(schema.users.email, oauthUserInfo.email.toLowerCase()))
             .get();
-        
+
         if (!user) {
             // Create new user
             const userId = generateId();
             const now = new Date();
-            
+
             await this.database.insert(schema.users).values({
                 id: userId,
                 email: oauthUserInfo.email.toLowerCase(),
@@ -478,7 +478,7 @@ export class AuthService extends BaseService {
                 createdAt: now,
                 updatedAt: now
             });
-            
+
             user = await this.database
                 .select()
                 .from(schema.users)
@@ -497,7 +497,7 @@ export class AuthService extends BaseService {
                     updatedAt: new Date()
                 })
                 .where(eq(schema.users.id, user.id));
-            
+
             // Refresh user data after updates
             user = await this.database
                 .select()
@@ -505,10 +505,10 @@ export class AuthService extends BaseService {
                 .where(eq(schema.users.id, user.id))
                 .get();
         }
-        
+
         return user!;
     }
-    
+
     /**
      * Log authentication attempt
      */
@@ -520,7 +520,7 @@ export class AuthService extends BaseService {
     ): Promise<void> {
         try {
             const requestMetadata = extractRequestMetadata(request);
-            
+
             await this.database.insert(schema.authAttempts).values({
                 identifier: identifier.toLowerCase(),
                 attemptType: attemptType as 'login' | 'register' | 'oauth_google' | 'oauth_github' | 'refresh' | 'reset_password',
@@ -531,19 +531,19 @@ export class AuthService extends BaseService {
             logger.error('Failed to log auth attempt', error);
         }
     }
-    
+
     /**
      * Validate and sanitize redirect URL to prevent open redirect attacks
      */
     private validateRedirectUrl(redirectUrl: string, request: Request): string | null {
         try {
             const requestUrl = new URL(request.url);
-            
+
             // Handle relative URLs by constructing absolute URL with same origin
-            const redirectUrlObj = redirectUrl.startsWith('/') 
+            const redirectUrlObj = redirectUrl.startsWith('/')
                 ? new URL(redirectUrl, requestUrl.origin)
                 : new URL(redirectUrl);
-            
+
             // Only allow same-origin redirects for security
             if (redirectUrlObj.origin !== requestUrl.origin) {
                 logger.warn('OAuth redirect URL rejected: different origin', {
@@ -553,7 +553,7 @@ export class AuthService extends BaseService {
                 });
                 return null;
             }
-            
+
             // Prevent redirecting to authentication endpoints to avoid loops
             const authPaths = ['/api/auth/', '/logout'];
             if (authPaths.some(path => redirectUrlObj.pathname.startsWith(path))) {
@@ -563,7 +563,7 @@ export class AuthService extends BaseService {
                 });
                 return null;
             }
-            
+
             return redirectUrl;
         } catch (error) {
             logger.warn('Invalid OAuth redirect URL format', { redirectUrl, error });
@@ -673,11 +673,11 @@ export class AuthService extends BaseService {
             };
         } catch (error) {
             await this.logAuthAttempt(email, 'email_verification', false, request);
-            
+
             if (error instanceof SecurityError) {
                 throw error;
             }
-            
+
             logger.error('Email verification error', error);
             throw new SecurityError(
                 SecurityErrorType.INVALID_INPUT,
@@ -723,12 +723,12 @@ export class AuthService extends BaseService {
                     });
                     throw error;
                 });
-            
+
             if (!user) {
                 logger.debug('User not found for auth', { userId });
                 return null;
             }
-            
+
             return mapUserResponse(user);
         } catch (error: unknown) {
             logger.error('Error getting user for auth', {
@@ -740,7 +740,7 @@ export class AuthService extends BaseService {
             return null;
         }
     }
-    
+
     /**
      * Validate token and return user (for middleware)
      */
@@ -748,23 +748,23 @@ export class AuthService extends BaseService {
         try {
             const jwtUtils = JWTUtils.getInstance(env);
             const payload = await jwtUtils.verifyToken(token);
-            
+
             if (!payload || payload.type !== 'access') {
                 return null;
             }
-            
+
             // Check if token is expired
             if (payload.exp * 1000 < Date.now()) {
                 logger.debug('Token expired', { exp: payload.exp });
                 return null;
             }
-            
+
             // Get user from database
             const user = await this.getUserForAuth(payload.sub);
             if (!user) {
                 return null;
             }
-            
+
             return {
                 user,
                 sessionId: payload.sessionId,
@@ -774,7 +774,7 @@ export class AuthService extends BaseService {
             return null;
         }
     }
-    
+
     /**
      * Resend verification OTP
      */
@@ -816,13 +816,13 @@ export class AuthService extends BaseService {
 
             // Generate new OTP
             await this.generateAndStoreVerificationOtp(email.toLowerCase());
-            
+
             logger.info('Verification OTP resent', { email });
         } catch (error) {
             if (error instanceof SecurityError) {
                 throw error;
             }
-            
+
             logger.error('Resend verification OTP error', error);
             throw new SecurityError(
                 SecurityErrorType.INVALID_INPUT,

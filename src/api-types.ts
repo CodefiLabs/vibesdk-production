@@ -23,9 +23,9 @@ export type {
 } from 'worker/database/types';
 
 // App-related API Types
-export type { 
+export type {
   AppsListData,
-  PublicAppsData, 
+  PublicAppsData,
   SingleAppData,
   FavoriteToggleData,
   CreateAppData,
@@ -105,20 +105,20 @@ export type {
   SecretTemplatesData
 } from 'worker/api/controllers/secrets/types';
 
-// Agent/CodeGen API Types  
+// Agent/CodeGen API Types
 export type {
   AgentConnectionData,
 } from 'worker/api/controllers/agent/types';
 
 // WebSocket Types
-export type { 
-  WebSocketMessage, 
+export type {
+  WebSocketMessage,
   WebSocketMessageData,
-  CodeFixEdits 
+  CodeFixEdits
 } from 'worker/api/websocketTypes';
 
 // Database/Schema Types commonly used in frontend
-export type { 
+export type {
   App,
   User,
   UserModelConfig,
@@ -135,7 +135,7 @@ export type {
 } from 'worker/database/types';
 
 // Agent/Generator Types
-export type { 
+export type {
   Blueprint as BlueprintType,
   ClientReportedErrorType,
   CodeReviewOutputType,
@@ -143,17 +143,17 @@ export type {
   FileOutputType as GeneratedFile,
 } from 'worker/agents/schemas';
 
-export type { 
-  CodeGenState 
+export type {
+  CodeGenState
 } from 'worker/agents/core/state';
 
-export type { 
+export type {
   RuntimeError,
-  StaticAnalysisResponse 
+  StaticAnalysisResponse
 } from 'worker/services/sandbox/sandboxTypes';
 
 // Config/Inference Types
-export type { 
+export type {
   AgentActionKey,
   AgentConfig,
   ModelConfig,
@@ -190,23 +190,23 @@ export interface StreamingResponse {
 export type AgentStreamingResponse = StreamingResponse;
 
 export {
-	type ImageAttachment, 
-	isSupportedImageType, 
+	type ImageAttachment,
+	isSupportedImageType,
 	MAX_IMAGE_SIZE_BYTES,
 	MAX_IMAGES_PER_MESSAGE,
 	SUPPORTED_IMAGE_MIME_TYPES
 } from 'worker/types/image-attachment';
 
 // Auth types imported from worker
-export type { 
-  AuthSession, 
-  ApiKeyInfo, 
-  AuthResult, 
+export type {
+  AuthSession,
+  ApiKeyInfo,
+  AuthResult,
   AuthUser,
-  OAuthProvider 
+  OAuthProvider
 } from 'worker/types/auth-types';
-export type { 
-  SessionResponse 
+export type {
+  SessionResponse
 } from 'worker/utils/authUtils';
 
 // Auth API Response Types (using existing worker types)

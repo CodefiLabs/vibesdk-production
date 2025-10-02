@@ -66,7 +66,7 @@ const SYSTEM_PROMPT = `You are Orange, the conversational AI interface for Cloud
 
 1. **For general questions or discussions**: Simply respond naturally and helpfully. Be friendly and informative.
 
-2. **When users want to modify their app or point out issues/bugs**: 
+2. **When users want to modify their app or point out issues/bugs**:
    - First acknowledge in first person: "I'll add that", "I'll fix that issue"
    - Then call the queue_request tool with a clear, actionable description (this internally relays to the dev agent)
    - The modification request should be specific but NOT include code-level implementation details
@@ -101,16 +101,16 @@ Users may face issues, bugs and runtime errors. When they report these, queue th
         - After this initial loop, the system goes into a maintainance loop of code review <> file regeneration where a CodeReview Agent reviews the code and patches files in parallel as needed.
         - After few reviewcycles, we finish the app.
     - If a user makes any demands, the request is first sent to you. And then your job is to queue the request using the queue_request tool.
-        - If the phase generation <> implementation loop is not finished, the queued requests would be fetched whenever the next phase planning happens. 
+        - If the phase generation <> implementation loop is not finished, the queued requests would be fetched whenever the next phase planning happens.
         - If the review loop is running, then after code reviews are finished, the state machine next enters phase generation loop again.
         - If the state machine had ended, we restart it in the phase generation loop with your queued requests.
         - Any queued request thus might take some time for implementation.
     - During each phase generation and phase implementation, the agents try to fetch the latest runtime errors from the sandbox too.
         - They do their best to fix them, however sometimes they might fail, so they need to be prompted again. The agents don't have full visibility on server logs though, they can only see the errors and static analysis. User must report their own experiences and issues through you.
-    - The frontend has several buttons for the user - 
+    - The frontend has several buttons for the user -
         - Deploy to cloudflare: button to deploy the app to cloudflare workers, as sandbox previews are ephemeral.
         - Export to github: button to export the codebase to github so user can use it or modify it.
-        - Refresh: button to refresh the preview. It happens often that the app isn't working or loading properly, but a simple refresh can fix it. Although you should still report this by queueing a request. 
+        - Refresh: button to refresh the preview. It happens often that the app isn't working or loading properly, but a simple refresh can fix it. Although you should still report this by queueing a request.
         - Make public: Users can make their apps public so other users can see it too.
         - Discover page: Users can see other public apps here.
 
@@ -137,7 +137,7 @@ I hope this description of the system is enough for you to understand your own r
     You: "I understand. Clearly my previous changes weren't enough. Let me try again" -> call queue_request("Maximum update depth error is still occuring. Did you check the errors for the hint? Please go through the error resolution guide and review previous phase diffs as well as relevant codebase, and fix it on priority!") -> "I hope its fixed this time"
 
 We have also recently added support for image inputs in beta. User can guide app generation or show bugs/UI issues using image inputs. You may inform the user about this feature.
-But it has limitations - Images are not stored in any form. Thus they would be lost after some time. They are just cached in the runtime temporarily. 
+But it has limitations - Images are not stored in any form. Thus they would be lost after some time. They are just cached in the runtime temporarily.
 
 ## IMPORTANT GUIDELINES:
 - DO NOT Write '<system_context>' tag in your response! That tag is only present in user responses
@@ -216,39 +216,39 @@ export class UserConversationProcessor extends AgentOperation<UserConversationIn
             const COMPACTION_THRESHOLD = Math.floor(0.8 * MAX_LLM_MESSAGES);
             const PRESERVE_RECENT_RATIO = 0.4; // Keep last 40% of messages uncompressed
             const MAX_MESSAGE_LENGTH = 400;
-            
+
             // No compaction needed if below threshold
             if (messages.length < COMPACTION_THRESHOLD) {
                 return messages;
             }
-        
+
         // Calculate split point: compactify older messages, preserve recent ones
         const numToPreserve = Math.ceil(messages.length * PRESERVE_RECENT_RATIO);
         const numToCompactify = messages.length - numToPreserve;
-        
+
         // Edge case: if nothing to compactify, just return recent messages
         if (numToCompactify <= 0) {
             return messages.slice(-numToPreserve);
         }
-        
+
         const oldMessages = messages.slice(0, numToCompactify);
         const recentMessages = messages.slice(numToCompactify);
-        
+
         // Build compactified conversation history
         const compactifiedLines: string[] = [
             '<Compactified Conversation History>',
             `[${numToCompactify} older messages condensed for context efficiency]`,
             ''
         ];
-        
+
         for (const msg of oldMessages) {
             try {
                 // Extract role label
                 const roleLabel = msg.role === 'assistant' ? 'assistant (you)' : msg.role === 'user' ? 'User' : msg.role;
-                
+
                 // Extract and process message content
                 let messageText = '';
-                
+
                 if (typeof msg.content === 'string') {
                     messageText = msg.content;
                 } else if (Array.isArray(msg.content)) {
@@ -257,9 +257,9 @@ export class UserConversationProcessor extends AgentOperation<UserConversationIn
                         .filter(item => item.type === 'text')
                         .map(item => item.text)
                         .join(' ');
-                    
+
                     const imageCount = msg.content.filter(item => item.type === 'image_url').length;
-                    
+
                     messageText = textParts;
                     if (imageCount > 0) {
                         messageText += ` [${imageCount} image(s) attached]`;
@@ -279,21 +279,21 @@ export class UserConversationProcessor extends AgentOperation<UserConversationIn
                         messageText = '[Empty message]';
                     }
                 }
-                
+
                 // Strip system context tags from the message
                 messageText = this.stripSystemContext(messageText);
-                
+
                 // Truncate if exceeds max length
                 if (messageText.length > MAX_MESSAGE_LENGTH) {
                     messageText = messageText.substring(0, MAX_MESSAGE_LENGTH) + '...';
                 }
-                
+
                 // Clean up whitespace and newlines for compactness
                 messageText = messageText
                     .replace(/\n+/g, ' ')  // Replace newlines with spaces
                     .replace(/\s+/g, ' ')   // Collapse multiple spaces
                     .trim();
-                
+
                 // Add to compactified history
                 if (messageText) {
                     compactifiedLines.push(`${roleLabel}: ${messageText}`);
@@ -304,25 +304,25 @@ export class UserConversationProcessor extends AgentOperation<UserConversationIn
                 compactifiedLines.push(`[Message processing error]`);
             }
         }
-        
+
             compactifiedLines.push('');
             compactifiedLines.push('---');
             compactifiedLines.push('[Recent conversation continues below in full detail...]');
-            
+
             // Create the compactified summary message
             const compactifiedMessage: ConversationMessage = {
                 role: 'user' as MessageRole,
                 content: compactifiedLines.join('\n'),
                 conversationId: `compactified-${Date.now()}`
             };
-            
+
             // Return compactified message + recent full messages
             return [compactifiedMessage, ...recentMessages];
         } catch (error) {
             // If compactification fails, fall back to returning original messages
             // or a safe subset to prevent complete failure
             console.error('Error during context compactification:', error);
-            
+
             // Safe fallback: return recent messages only if above threshold
             const COMPACTION_THRESHOLD = Math.floor(0.8 * MAX_LLM_MESSAGES);
             if (messages.length >= COMPACTION_THRESHOLD) {
@@ -330,7 +330,7 @@ export class UserConversationProcessor extends AgentOperation<UserConversationIn
                 console.warn(`Compactification failed, returning last ${safeSubset} messages as fallback`);
                 return messages.slice(-safeSubset);
             }
-            
+
             // Below threshold, return all messages
             return messages;
         }
@@ -340,7 +340,7 @@ export class UserConversationProcessor extends AgentOperation<UserConversationIn
     async execute(inputs: UserConversationInputs, options: OperationOptions): Promise<UserConversationOutputs> {
         const { env, logger, context, agent } = options;
         const { userMessage, pastMessages, errors, images, projectUpdates } = inputs;
-        logger.info("Processing user message", { 
+        logger.info("Processing user message", {
             messageLength: inputs.userMessage.length,
             hasImages: !!images && images.length > 0,
             imageCount: images?.length || 0
@@ -348,7 +348,7 @@ export class UserConversationProcessor extends AgentOperation<UserConversationIn
 
         try {
             const systemPromptMessages = getSystemPromptWithProjectContext(SYSTEM_PROMPT, context, CodeSerializerType.SIMPLE);
-            
+
             // Create user message with optional images for inference
             const userPromptForInference = buildUserMessageWithContext(userMessage, errors, projectUpdates, true);
             const userMessageForInference = images && images.length > 0
@@ -358,22 +358,22 @@ export class UserConversationProcessor extends AgentOperation<UserConversationIn
                     'high'
                 )
                 : createUserMessage(userPromptForInference);
-            
+
             // For conversation history, store only text (images are ephemeral and not persisted)
             const userPromptForHistory = buildUserMessageWithContext(userMessage, errors, projectUpdates, false);
             const userMessageForHistory = images && images.length > 0
                 ? createUserMessage(`${userPromptForHistory}\n\n[${images.length} image(s) attached]`)
                 : createUserMessage(userPromptForHistory);
-            
+
             const messages = [...pastMessages, {...userMessageForHistory, conversationId: IdGenerator.generateConversationId()}];
 
             let extractedUserResponse = "";
-            
+
             // Generate unique conversation ID for this turn
             const aiConversationId = IdGenerator.generateConversationId();
 
             logger.info("Generated conversation ID", { aiConversationId });
-            
+
             // Assemble all tools with lifecycle callbacks for UI updates
             const tools: ToolDefinition<any, any>[] = [
                 ...buildTools(agent, logger)
@@ -396,7 +396,7 @@ export class UserConversationProcessor extends AgentOperation<UserConversationIn
             const compactifiedMessages = await this.compactifyContext(pastMessages);
             if (compactifiedMessages.length !== pastMessages.length) {
                 const numCompactified = pastMessages.length - (compactifiedMessages.length - 1); // -1 for the compactified summary message
-                logger.warn("Compactified conversation history to stay within token limit", { 
+                logger.warn("Compactified conversation history to stay within token limit", {
                     originalLength: pastMessages.length,
                     compactifiedLength: compactifiedMessages.length,
                     numOldMessagesCompacted: numCompactified,
@@ -404,13 +404,13 @@ export class UserConversationProcessor extends AgentOperation<UserConversationIn
                 });
             }
 
-            logger.info("Executing inference for user message", { 
+            logger.info("Executing inference for user message", {
                 messageLength: userMessage.length,
                 aiConversationId,
                 compactifiedMessages,
                 tools
             });
-            
+
             // Don't save the system prompts so that every time new initial prompts can be generated with latest project context
             // Use inference message (with images) for AI, but store text-only in history
             const result = await executeInference({
@@ -429,7 +429,7 @@ export class UserConversationProcessor extends AgentOperation<UserConversationIn
                 }
             });
 
-            
+
             logger.info("Successfully processed user message", {
                 streamingSuccess: !!extractedUserResponse,
             });
@@ -458,8 +458,8 @@ export class UserConversationProcessor extends AgentOperation<UserConversationIn
             logger.error("Error processing user message:", error);
             if (error instanceof RateLimitExceededError || error instanceof SecurityError) {
                 throw error;
-            }   
-            
+            }
+
             // Fallback response
             return {
                 conversationResponse: {
