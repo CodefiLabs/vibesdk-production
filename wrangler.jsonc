@@ -89,7 +89,7 @@
 				"name": "CodeGenObject"
 			},
             {
-                "class_name": "UserAppSandboxService",
+                "class_name": "vibesdk-production-userappsandboxservice",
                 "name": "Sandbox"
             },
             {
