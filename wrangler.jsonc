@@ -90,6 +90,10 @@
 				"name": "CodeGenObject"
 			},
             {
+                "class_name": "UserAppSandboxService",
+                "name": "Sandbox"
+            },
+            {
                 "class_name": "DORateLimitStore",
                 "name": "DORateLimitStore"
             }
@@ -115,7 +119,8 @@
 	"migrations": [
 		{
 			"new_sqlite_classes": [
-				"CodeGeneratorAgent"
+				"CodeGeneratorAgent",
+				"UserAppSandboxService"
 			],
 			"tag": "v1"
 		},
