@@ -65,7 +65,7 @@ export function ApiKeysSection() {
 		try {
 			setLoading(true);
 			const response = await apiClient.getApiKeys();
-			if (response.success) {
+			if (response.success && response.data) {
 				setApiKeys(response.data.apiKeys);
 			}
 		} catch (error) {
@@ -86,7 +86,7 @@ export function ApiKeysSection() {
 			setCreating(true);
 			const response = await apiClient.createApiKey({ name: newKeyName.trim() });
 
-			if (response.success) {
+			if (response.success && response.data) {
 				setNewlyCreatedKey(response.data);
 				setShowNewKeyDialog(true);
 				setCreateDialogOpen(false);

@@ -989,48 +989,49 @@ class ApiClient {
 	// ===============================
 
 	/**
-	 * Get user API keys
+	 * Get user API keys (V1 API)
 	 */
-	async getApiKeys(): Promise<ApiResponse<ApiKeysData>> {
-		return this.request<ApiKeysData>('/api/auth/api-keys');
+	async getApiKeys(): Promise<ApiResponse<{ apiKeys: ApiKeyInfo[] }>> {
+		return this.request<{ apiKeys: ApiKeyInfo[] }>('/api/v1/api-keys', {
+			method: 'GET',
+		});
 	}
 
 	/**
-	 * Create a new API key
+	 * Create a new API key (V1 API)
 	 */
 	async createApiKey(data: {
 		name: string;
 	}): Promise<
 		ApiResponse<{
-			key: string;
-			keyPreview: string;
+			apiKey: string;
+			id: string;
 			name: string;
+			keyPreview: string;
+			createdAt: string | null;
 			message: string;
 		}>
 	> {
 		return this.request<{
-			key: string;
-			keyPreview: string;
+			apiKey: string;
+			id: string;
 			name: string;
+			keyPreview: string;
+			createdAt: string | null;
 			message: string;
-		}>('/api/auth/api-keys', {
+		}>('/api/v1/api-keys', {
 			method: 'POST',
 			body: data,
 		});
 	}
 
 	/**
-	 * Revoke an API key
+	 * Revoke an API key (V1 API)
 	 */
-	async revokeApiKey(
-		keyId: string,
-	): Promise<ApiResponse<{ message: string }>> {
-		return this.request<{ message: string }>(
-			`/api/auth/api-keys/${keyId}`,
-			{
-				method: 'DELETE',
-			},
-		);
+	async revokeApiKey(keyId: string): Promise<ApiResponse<{ success: boolean }>> {
+		return this.request<{ success: boolean }>(`/api/v1/api-keys/${keyId}`, {
+			method: 'DELETE',
+		});
 	}
 
 	// ===============================
@@ -1136,54 +1137,6 @@ class ApiClient {
 
 		// Redirect to OAuth provider
 		window.location.href = oauthUrl.toString();
-	}
-
-	// ========================================
-	// API KEYS MANAGEMENT
-	// ========================================
-
-	/**
-	 * Get all API keys for the current user
-	 */
-	async getApiKeys(): Promise<ApiResponse<{ apiKeys: ApiKeyInfo[] }>> {
-		return this.request<{ apiKeys: ApiKeyInfo[] }>('/api/v1/api-keys', {
-			method: 'GET',
-		});
-	}
-
-	/**
-	 * Create a new API key
-	 */
-	async createApiKey(data: { name: string }): Promise<
-		ApiResponse<{
-			apiKey: string;
-			id: string;
-			name: string;
-			keyPreview: string;
-			createdAt: string | null;
-			message: string;
-		}>
-	> {
-		return this.request<{
-			apiKey: string;
-			id: string;
-			name: string;
-			keyPreview: string;
-			createdAt: string | null;
-			message: string;
-		}>('/api/v1/api-keys', {
-			method: 'POST',
-			body: data,
-		});
-	}
-
-	/**
-	 * Revoke an API key
-	 */
-	async revokeApiKey(keyId: string): Promise<ApiResponse<{ success: boolean }>> {
-		return this.request<{ success: boolean }>(`/api/v1/api-keys/${keyId}`, {
-			method: 'DELETE',
-		});
 	}
 }
 
