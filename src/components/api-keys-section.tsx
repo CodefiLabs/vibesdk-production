@@ -45,6 +45,8 @@ interface NewApiKeyResponse {
 }
 
 export function ApiKeysSection() {
+	console.log('ApiKeysSection rendering');
+
 	const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -59,6 +61,7 @@ export function ApiKeysSection() {
 
 	// Load API keys
 	useEffect(() => {
+		console.log('ApiKeysSection useEffect running');
 		loadApiKeys();
 	}, []);
 
