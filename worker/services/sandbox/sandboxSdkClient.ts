@@ -1,4 +1,4 @@
-import { getSandbox, Sandbox, ExecuteResponse } from '@cloudflare/sandbox';
+import { getSandbox, Sandbox, ExecuteResponse, parseSSEStream, LogEvent } from '@cloudflare/sandbox';
 
 import {
     TemplateDetailsResponse,
