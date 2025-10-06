@@ -56,6 +56,7 @@ import {
 import { toast } from 'sonner';
 import { apiClient } from '@/lib/api-client';
 import { ByokApiKeysModal } from '@/components/byok-api-keys-modal';
+import { ApiKeysSection } from '@/components/api-keys-section';
 
 // Import provider logos (reusing existing pattern from BYOK modal)
 import OpenAILogo from '@/assets/provider-logos/openai.svg?react';
@@ -1766,6 +1767,9 @@ export default function SettingsPage() {
 							</div>
 						</CardContent>
 					</Card>
+
+					{/* VibeSDK API Keys Section */}
+					<ApiKeysSection />
 
 					<div className="space-y-4 p-3">
 						<h4 className="font-medium text-destructive">
