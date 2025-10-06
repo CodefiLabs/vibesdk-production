@@ -101,7 +101,7 @@ export class V1ProjectsController extends BaseController {
 			const apiKey = context.apiKey;
 
 			// Debug logging
-			this.logger.info('Authorization check', {
+			V1ProjectsController.logger.info('Authorization check', {
 				apiKeyUser: apiKeyUser.id,
 				targetUserId: userId,
 				hasApiKey: !!apiKey,
@@ -112,7 +112,7 @@ export class V1ProjectsController extends BaseController {
 			const hasAdminScope = apiKey?.scopes &&
 				JSON.parse(apiKey.scopes).includes('*');
 
-			this.logger.info('Admin scope check', {
+			V1ProjectsController.logger.info('Admin scope check', {
 				hasAdminScope,
 				scopesParsed: apiKey?.scopes ? JSON.parse(apiKey.scopes) : null
 			});
@@ -163,9 +163,9 @@ export class V1ProjectsController extends BaseController {
 
 			// Get template and initialize agent
 			const { sandboxSessionId, templateDetails, selection } =
-				await getTemplateForQuery(env, inferenceContext, instructions, this.logger);
+				await getTemplateForQuery(env, inferenceContext, instructions, V1ProjectsController.logger);
 
-			const agentInstance = await getAgentStub(env, projectId, false, this.logger);
+			const agentInstance = await getAgentStub(env, projectId, false, V1ProjectsController.logger);
 
 			// Start generation asynchronously
 			const url = new URL(request.url);
@@ -189,7 +189,7 @@ export class V1ProjectsController extends BaseController {
 			const websocketUrl = `${url.protocol === 'https:' ? 'wss:' : 'ws:'}//${url.host}/api/agent/${projectId}/ws`;
 			const statusUrl = `${url.origin}/api/v1/projects/${projectId}`;
 
-			this.logger.info('Project created via API', {
+			V1ProjectsController.logger.info('Project created via API', {
 				projectId,
 				userId,
 				template: templateDetails.name
@@ -207,7 +207,7 @@ export class V1ProjectsController extends BaseController {
 				}
 			});
 		} catch (error) {
-			this.logger.error('Error creating project:', error);
+			V1ProjectsController.logger.error('Error creating project:', error);
 			return V1ProjectsController.createErrorResponse(
 				'Failed to create project',
 				500
@@ -272,7 +272,7 @@ export class V1ProjectsController extends BaseController {
 			let previewUrl: string | null = null;
 
 			try {
-				const agentStub = await getAgentStub(env, projectId, true, this.logger);
+				const agentStub = await getAgentStub(env, projectId, true, V1ProjectsController.logger);
 				if (await agentStub.isInitialized()) {
 					const state = await agentStub.getFullState() as CodeGenState;
 					previewUrl = await agentStub.getPreviewUrlCache();
@@ -295,7 +295,7 @@ export class V1ProjectsController extends BaseController {
 				}
 			} catch (error) {
 				// Agent not active, that's okay - no progress available
-				this.logger.debug('Agent not active for project', { projectId });
+				V1ProjectsController.logger.debug('Agent not active for project', { projectId });
 			}
 
 			// Construct production URL
@@ -322,7 +322,7 @@ export class V1ProjectsController extends BaseController {
 				}
 			});
 		} catch (error) {
-			this.logger.error('Error getting project:', error);
+			V1ProjectsController.logger.error('Error getting project:', error);
 			return V1ProjectsController.createErrorResponse(
 				'Failed to get project',
 				500

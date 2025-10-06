@@ -25,23 +25,22 @@ export async function apiKeyAuthMiddleware(
 
 		const apiKey = match[1];
 
-		// TEMPORARY: Hardcoded test API key (REMOVE IN PRODUCTION!)
-		const HARDCODED_TEST_KEY = 'vsk_test_hardcoded_key_12345678901234567890';
-		if (apiKey === HARDCODED_TEST_KEY) {
-			logger.info('Using hardcoded test API key');
-			// Create a mock user for testing
+		// Check if this is the admin API key from Cloudflare secret
+		if (c.env.TS_API_KEY && apiKey === c.env.TS_API_KEY) {
+			logger.info('Using admin API key from TS_API_KEY secret');
+			// Create a mock user for admin API key
 			c.set('user', {
-				id: 'test-user-id',
-				email: 'test@example.com',
-				displayName: 'Test User',
+				id: 'admin-api-user',
+				email: 'api@vibesdk.com',
+				displayName: 'Admin API User',
 				emailVerified: true,
 			});
 			c.set('apiKey', {
-				id: 'test-key-id',
-				userId: 'test-user-id',
-				name: 'Hardcoded Test Key',
-				keyHash: 'test-hash',
-				keyPreview: 'vsk_test_hardcoded...',
+				id: 'admin-api-key-id',
+				userId: 'admin-api-user',
+				name: 'Admin API Key',
+				keyHash: 'admin-key-hash',
+				keyPreview: 'vsk_admin...',
 				scopes: '["*"]',
 				isActive: true,
 				lastUsed: new Date(),

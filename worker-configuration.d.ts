@@ -28,6 +28,7 @@ declare namespace Cloudflare {
 		GITHUB_CLIENT_SECRET: string;
 		JWT_SECRET: string;
 		ENTROPY_KEY: string;
+		TS_API_KEY: string;
 		ENVIRONMENT: string;
         USE_TUNNEL_FOR_PREVIEW: boolean;
 		SECRETS_ENCRYPTION_KEY: string;
