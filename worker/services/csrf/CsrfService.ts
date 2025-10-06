@@ -98,15 +98,22 @@ export class CsrfService {
      */
     static validateToken(request: Request): boolean {
         const method = request.method.toUpperCase();
-        
+
         // Skip validation for safe methods
         if (['GET', 'HEAD', 'OPTIONS'].includes(method)) {
             return true;
         }
-        
+
         // Skip for WebSocket upgrades
         const upgradeHeader = request.headers.get('upgrade');
         if (upgradeHeader?.toLowerCase() === 'websocket') {
+            return true;
+        }
+
+        // Skip CSRF for V1 API routes (they use API key auth instead)
+        const path = new URL(request.url).pathname;
+        if (path.startsWith('/api/v1')) {
+            logger.debug('Skipping CSRF validation for V1 API route', { path });
             return true;
         }
         
