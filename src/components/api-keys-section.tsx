@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Key, Copy, Trash2, Plus, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -64,9 +64,7 @@ export function ApiKeysSection() {
 	const loadApiKeys = async () => {
 		try {
 			setLoading(true);
-			const response = await apiClient.get<{ success: boolean; data: { apiKeys: ApiKey[] } }>(
-				'/api/v1/api-keys'
-			);
+			const response = await apiClient.getApiKeys();
 			if (response.success) {
 				setApiKeys(response.data.apiKeys);
 			}
@@ -86,10 +84,7 @@ export function ApiKeysSection() {
 
 		try {
 			setCreating(true);
-			const response = await apiClient.post<{ success: boolean; data: NewApiKeyResponse }>(
-				'/api/v1/api-keys',
-				{ name: newKeyName.trim() }
-			);
+			const response = await apiClient.createApiKey({ name: newKeyName.trim() });
 
 			if (response.success) {
 				setNewlyCreatedKey(response.data);
@@ -112,9 +107,7 @@ export function ApiKeysSection() {
 
 		try {
 			setDeleting(true);
-			const response = await apiClient.delete<{ success: boolean }>(
-				`/api/v1/api-keys/${keyToDelete.id}`
-			);
+			const response = await apiClient.revokeApiKey(keyToDelete.id);
 
 			if (response.success) {
 				await loadApiKeys();
