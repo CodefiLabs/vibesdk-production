@@ -143,9 +143,17 @@ line1
 line1_updated
 >>>>>>> REPLACE
 
+<<<<<<< SEARCH
 lineX
+=======
+lineX_updated
+>>>>>>> REPLACE
 
+<<<<<<< SEARCH
 line3
+=======
+line3_updated
+>>>>>>> REPLACE`;
 
 			const result = applyDiff(original, diff, { strict: false });
 			expect(result.content).toContain('line1_updated');
@@ -178,11 +186,21 @@ interface TileProps {
 }
 >>>>>>> REPLACE
 
+<<<<<<< SEARCH
 const TileComponent: React.FC<TileProps> = ({ value }) => {
   return (
     <motion.div>{value}</motion.div>
   );
 };
+=======
+const TileComponent: React.FC<TileProps> = ({ value, position }) => {
+  return (
+    <motion.div layoutId={position ? \`tile-\${position.x}-\${position.y}\` : undefined}>
+      {value}
+    </motion.div>
+  );
+};
+>>>>>>> REPLACE`;
 
 			const result = applyDiff(original, diff, { strict: false });
 
@@ -205,7 +223,11 @@ const a = 1;
 const a = 10;
 >>>>>>> REPLACE
 
+<<<<<<< SEARCH
 const b = 2;
+=======
+const b = 20;
+>>>>>>> REPLACE`;
 
 			const result = applyDiff(original, diff, { strict: false });
 			expect(result.results.blocksFailed).toBe(2);
@@ -248,9 +270,17 @@ const x = 1;
 const x = 10;
 >>>>>>> REPLACE
 
+<<<<<<< SEARCH
 const missing = 999;
+=======
+const missing = 1000;
+>>>>>>> REPLACE
 
+<<<<<<< SEARCH
 const z = 3;
+=======
+const z = 30;
+>>>>>>> REPLACE`;
 
 			// Should fail on second block and never reach third
 			expect(() => applyDiff(original, diff, { strict: true }))
@@ -279,9 +309,20 @@ interface Props {
 }
 >>>>>>> REPLACE
 
+<<<<<<< SEARCH
 const Component: React.FC<Props> = ({ title }) => {
   return  <h1>{title}</h1>;
 };
+=======
+const Component: React.FC<Props> = ({ title, subtitle }) => {
+  return (
+    <div>
+      <h1>{title}</h1>
+      {subtitle && <h2>{subtitle}</h2>}
+    </div>
+  );
+};
+>>>>>>> REPLACE`;
 
 			// Force exact matching only to test whitespace sensitivity
 			const result = applyDiff(original, diff, {
@@ -373,9 +414,17 @@ line2_updated
 	const a = 10;
 >>>>>>> REPLACE
 
+<<<<<<< SEARCH
 	let b = 2;
+=======
+	const b = 20;
+>>>>>>> REPLACE
 
+<<<<<<< SEARCH
 	let c = 3;
+=======
+	const c = 30;
+>>>>>>> REPLACE`;
 
 			const result = applyDiff(original, diff);
 			expect(result.content).toContain('const a = 10;');
@@ -523,9 +572,15 @@ let tileIdCounter = 1;
 }`;
 
 			const diff = `src/lib/game-logic.ts
+<<<<<<< SEARCH
 function test() {
     return 42;
 }
+=======
+function test() {
+    return 100;
+}
+>>>>>>> REPLACE`;
 
 			// Should ignore the file path and apply the change
 			const result = applyDiff(original, diff);
@@ -741,9 +796,17 @@ line1
 LINE1
 >>>>>>> REPLACE
 
+<<<<<<< SEARCH
 lineX
+=======
+LINEX
+>>>>>>> REPLACE
 
+<<<<<<< SEARCH
 line3
+=======
+LINE3
+>>>>>>> REPLACE`;
 
 			const result = applyDiff(original, diff, { strict: false });
 			expect(result.content).toContain('LINE1');
@@ -1051,7 +1114,11 @@ function hello() {
 }
 >>>>>>> REPLACE
 
+<<<<<<< SEARCH
     return "world";
+=======
+    return "universe";
+>>>>>>> REPLACE`;
 
             const result = applyDiff(original, diffWithFailures, { strict: false });
 
