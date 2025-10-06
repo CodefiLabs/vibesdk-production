@@ -55,6 +55,7 @@ export function ApiKeysSection() {
 	const [keyToDelete, setKeyToDelete] = useState<ApiKey | null>(null);
 	const [deleting, setDeleting] = useState(false);
 	const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
+	const [error, setError] = useState<string | null>(null);
 
 	// Load API keys
 	useEffect(() => {
@@ -64,12 +65,14 @@ export function ApiKeysSection() {
 	const loadApiKeys = async () => {
 		try {
 			setLoading(true);
+			setError(null);
 			const response = await apiClient.getApiKeys();
 			if (response.success && response.data) {
 				setApiKeys(response.data.apiKeys);
 			}
-		} catch (error) {
+		} catch (error: any) {
 			console.error('Failed to load API keys:', error);
+			setError(error.message || 'Failed to load API keys');
 			toast.error('Failed to load API keys');
 		} finally {
 			setLoading(false);
@@ -210,6 +213,11 @@ export function ApiKeysSection() {
 				</div>
 			</CardHeader>
 			<CardContent className="space-y-4 mt-4 px-6">
+				{error && (
+					<div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+						<p className="text-sm text-red-500">{error}</p>
+					</div>
+				)}
 				{loading ? (
 					<div className="flex items-center gap-3 py-8">
 						<Key className="h-5 w-5 animate-pulse text-text-tertiary" />
