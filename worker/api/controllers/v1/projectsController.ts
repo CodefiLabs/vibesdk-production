@@ -216,7 +216,7 @@ export class V1ProjectsController extends BaseController {
 
 			const { AppService } = await import('../../../database/services/AppService');
 			const appService = new AppService(env);
-			const app = await appService.getAppById(projectId);
+			const app = await appService.getAppDetails(projectId);
 
 			if (!app) {
 				return V1ProjectsController.createErrorResponse(
@@ -246,11 +246,11 @@ export class V1ProjectsController extends BaseController {
 			try {
 				const agentStub = await getAgentStub(env, projectId, true, this.logger);
 				if (await agentStub.isInitialized()) {
-					const state = await agentStub.getState();
+					const state = await agentStub.getFullState();
 					previewUrl = await agentStub.getPreviewUrlCache();
 
 					const totalFiles = state.blueprint?.phases?.reduce(
-						(sum, phase) => sum + phase.files.length,
+						(sum: number, phase: any) => sum + phase.files.length,
 						0
 					) || 0;
 
