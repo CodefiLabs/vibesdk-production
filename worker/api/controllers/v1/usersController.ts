@@ -15,7 +15,7 @@ interface FindOrCreateUserResponse {
 		id: string;
 		email: string;
 		displayName: string;
-		createdAt: Date;
+		createdAt: Date | null;
 		isNew: boolean;
 	};
 }
@@ -26,7 +26,7 @@ interface GetUserResponse {
 		email: string;
 		displayName: string;
 		avatarUrl?: string;
-		createdAt: Date;
+		createdAt: Date | null;
 		appsCount: number;
 	};
 }

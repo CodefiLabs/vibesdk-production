@@ -156,7 +156,7 @@ export class V1ApiKeysController extends BaseController {
 	 * DELETE /api/v1/api-keys/:id
 	 */
 	static async revokeApiKey(
-		request: Request,
+		_request: Request,
 		env: Env,
 		_ctx: ExecutionContext,
 		context: RouteContext

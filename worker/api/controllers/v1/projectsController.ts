@@ -35,7 +35,7 @@ interface GetProjectResponse {
 		userId: string;
 		title: string;
 		description: string | null;
-		status: 'generating' | 'completed';
+		status: string;
 		previewUrl: string | null;
 		productionUrl: string | null;
 		progress?: {
@@ -44,7 +44,7 @@ interface GetProjectResponse {
 			totalFiles: number;
 			percentComplete: number;
 		};
-		createdAt: Date;
+		createdAt: Date | null;
 		completedAt: Date | null;
 		visibility: string;
 		framework: string | null;
@@ -66,16 +66,14 @@ export class V1ProjectsController extends BaseController {
 			const bodyResult = await V1ProjectsController.parseJsonBody<CreateProjectRequest>(request);
 
 			if (!bodyResult.success) {
-				return bodyResult.response!;
+				return bodyResult.response as ControllerResponse<ApiResponse<CreateProjectResponse>>;
 			}
 
 			const {
 				userId,
 				instructions,
 				language = 'typescript',
-				frameworks = ['react', 'vite'],
-				template = 'auto',
-				metadata
+				frameworks = ['react', 'vite']
 			} = bodyResult.data!;
 
 			// Validate required fields
@@ -201,7 +199,7 @@ export class V1ProjectsController extends BaseController {
 	 * GET /api/v1/projects/:id
 	 */
 	static async getProject(
-		request: Request,
+		_request: Request,
 		env: Env,
 		_ctx: ExecutionContext,
 		context: RouteContext
