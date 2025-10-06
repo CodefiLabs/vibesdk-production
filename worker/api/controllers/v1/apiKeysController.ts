@@ -1,5 +1,5 @@
 import { BaseController } from '../baseController';
-import { ApiKeyService } from '../../../database/services/ApiKeyService';
+import { ApiKeyService, ApiKeyInfo } from '../../../database/services/ApiKeyService';
 import { sha256 } from '../../../utils/cryptoUtils';
 import type { RouteContext } from '../../types/route-context';
 import type { ControllerResponse, ApiResponse } from '../types';
@@ -18,14 +18,7 @@ interface CreateApiKeyResponse {
 }
 
 interface ListApiKeysResponse {
-	apiKeys: Array<{
-		id: string;
-		name: string;
-		keyPreview: string;
-		createdAt: Date | null;
-		lastUsed: Date | null;
-		isActive: boolean | null;
-	}>;
+	apiKeys: ApiKeyInfo[];
 }
 
 export class V1ApiKeysController extends BaseController {
@@ -44,7 +37,7 @@ export class V1ApiKeysController extends BaseController {
 			const bodyResult = await V1ApiKeysController.parseJsonBody<CreateApiKeyRequest>(request);
 
 			if (!bodyResult.success) {
-				return bodyResult.response!;
+				return bodyResult.response as ControllerResponse<ApiResponse<CreateApiKeyResponse>>;
 			}
 
 			const { name } = bodyResult.data!;
@@ -129,7 +122,7 @@ export class V1ApiKeysController extends BaseController {
 	 * GET /api/v1/api-keys
 	 */
 	static async listApiKeys(
-		request: Request,
+		_request: Request,
 		env: Env,
 		_ctx: ExecutionContext,
 		context: RouteContext
