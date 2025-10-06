@@ -4,6 +4,7 @@
 
 import { GlobalConfigurableSettings } from '../../config';
 import { AuthUser } from '../../types/auth-types';
+import { ApiKey } from '../../database/schema';
 
 /**
  * Route context containing authenticated user and path parameters
@@ -18,6 +19,11 @@ export interface RouteContext {
      * Session ID (null if not authenticated or public route)
      */
     sessionId: string | null;
+
+	/**
+	 * API Key used for authentication (only present for API key auth)
+	 */
+	apiKey?: ApiKey;
 
     /**
      * Global configurations for the application

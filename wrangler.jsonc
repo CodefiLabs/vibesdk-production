@@ -75,14 +75,14 @@
 		}
 	],
 	"d1_databases": [
-		{
-			"binding": "DB",
-			"database_name": "vibesdk-db",
-			"database_id": "42e5fdd2-9e9f-4276-a71b-ae1ec28f8b7d",
-			"migrations_dir": "migrations",
-			"remote": true
-		}
-	],
+        {
+            "binding": "DB",
+            "database_name": "vibesdk-db",
+            "database_id": "42e5fdd2-9e9f-4276-a71b-ae1ec28f8b7d",
+            "migrations_dir": "migrations",
+            "remote": true
+        }
+    ],
 	"durable_objects": {
 		"bindings": [
 			{
@@ -100,17 +100,17 @@
 		]
 	},
     "r2_buckets": [
-      {
-        "binding": "TEMPLATES_BUCKET",
-        "bucket_name": "vibesdk-templates",
-        "remote": true
-      }
+        {
+            "binding": "TEMPLATES_BUCKET",
+            "bucket_name": "vibesdk-templates",
+            "remote": true
+        }
     ],
     "kv_namespaces": [
         {
             "binding": "VibecoderStore",
-            "id": "c9934e340a1242f4ab1d188c8eb6dcaf",
-            "remote": true
+            "id": "local",
+            "remote": false
         }
     ],
     // "placement": {
@@ -133,13 +133,13 @@
 	],
 	"routes": [
         {
-            "pattern": "build.cloudflare.dev",
+            "pattern": "builder.tractionstudio.ai",
             "custom_domain": true
         },
         {
-            "pattern": "*build-preview.cloudflare.dev/*",
+            "pattern": "*builder.tractionstudio.ai/*",
             "custom_domain": false,
-            "zone_id": "db01fac4261b2604aacad8410443a3e2"
+            "zone_id": "a398249b6b6acab9dcaa0cad201bab44"
         }
     ],
 	"vars": {

@@ -25,6 +25,34 @@ export async function apiKeyAuthMiddleware(
 
 		const apiKey = match[1];
 
+		// TEMPORARY: Hardcoded test API key (REMOVE IN PRODUCTION!)
+		const HARDCODED_TEST_KEY = 'vsk_test_hardcoded_key_12345678901234567890';
+		if (apiKey === HARDCODED_TEST_KEY) {
+			logger.info('Using hardcoded test API key');
+			// Create a mock user for testing
+			c.set('user', {
+				id: 'test-user-id',
+				email: 'test@example.com',
+				displayName: 'Test User',
+				emailVerified: true,
+			});
+			c.set('apiKey', {
+				id: 'test-key-id',
+				userId: 'test-user-id',
+				name: 'Hardcoded Test Key',
+				keyHash: 'test-hash',
+				keyPreview: 'vsk_test_hardcoded...',
+				scopes: '["*"]',
+				isActive: true,
+				lastUsed: new Date(),
+				requestCount: 0,
+				expiresAt: null,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			});
+			return undefined; // Continue to next middleware
+		}
+
 		// Hash the API key for database lookup
 		const apiKeyHash = await sha256(apiKey);
 

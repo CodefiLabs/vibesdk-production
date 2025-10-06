@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { apiKeyAuthMiddleware } from '../../../middleware/auth/apiKeyAuth';
 import { AppEnv } from '../../../types/appenv';
 import { createLogger } from '../../../logger';
+import { AuthConfig, setAuthLevel } from '../../../middleware/auth/routeAuth';
 import { usersRouter } from './usersRoutes';
 import { projectsRouter } from './projectsRoutes';
 import { apiKeysRouter } from './apiKeysRoutes';
@@ -50,5 +51,9 @@ v1Router.route('/api-keys', apiKeysRouter);
 
 export function setupV1Routes(app: Hono<AppEnv>): void {
 	logger.info('Setting up V1 API routes');
+
+	// V1 routes use API key auth, not JWT auth - set to public to skip JWT middleware
+	app.use('/api/v1/*', setAuthLevel(AuthConfig.public));
+
 	app.route('/api/v1', v1Router);
 }

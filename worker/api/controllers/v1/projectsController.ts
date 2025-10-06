@@ -96,9 +96,29 @@ export class V1ProjectsController extends BaseController {
 				);
 			}
 
-			// Authorization: API key can only create projects for its own user
+			// Authorization: Check if API key has admin scope or matches user
 			const apiKeyUser = context.user!;
-			if (apiKeyUser.id !== userId) {
+			const apiKey = context.apiKey;
+
+			// Debug logging
+			this.logger.info('Authorization check', {
+				apiKeyUser: apiKeyUser.id,
+				targetUserId: userId,
+				hasApiKey: !!apiKey,
+				apiKeyScopes: apiKey?.scopes
+			});
+
+			// Check if API key has admin scope (*)
+			const hasAdminScope = apiKey?.scopes &&
+				JSON.parse(apiKey.scopes).includes('*');
+
+			this.logger.info('Admin scope check', {
+				hasAdminScope,
+				scopesParsed: apiKey?.scopes ? JSON.parse(apiKey.scopes) : null
+			});
+
+			// Allow if admin scope OR if creating for own user
+			if (!hasAdminScope && apiKeyUser.id !== userId) {
 				return V1ProjectsController.createErrorResponse(
 					'API key can only create projects for its own user',
 					403
@@ -226,9 +246,16 @@ export class V1ProjectsController extends BaseController {
 				);
 			}
 
-			// Authorization: API key owner must match project owner
+			// Authorization: Check if API key has admin scope or matches owner
 			const apiKeyUser = context.user!;
-			if (app.userId !== apiKeyUser.id) {
+			const apiKey = context.apiKey;
+
+			// Check if API key has admin scope (*)
+			const hasAdminScope = apiKey?.scopes &&
+				JSON.parse(apiKey.scopes).includes('*');
+
+			// Allow if admin scope OR if accessing own project
+			if (!hasAdminScope && app.userId !== apiKeyUser.id) {
 				return V1ProjectsController.createErrorResponse(
 					'Access denied',
 					403

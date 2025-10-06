@@ -122,9 +122,16 @@ export class V1UsersController extends BaseController {
 				);
 			}
 
-			// Authorization: API key owner can only access themselves
+			// Authorization: Check if API key has admin scope or matches user
 			const apiKeyUser = context.user!;
-			if (apiKeyUser.id !== userId) {
+			const apiKey = context.apiKey;
+
+			// Check if API key has admin scope (*)
+			const hasAdminScope = apiKey?.scopes &&
+				JSON.parse(apiKey.scopes).includes('*');
+
+			// Allow if admin scope OR if accessing own user
+			if (!hasAdminScope && apiKeyUser.id !== userId) {
 				return V1UsersController.createErrorResponse(
 					'API key can only access its own user',
 					403
