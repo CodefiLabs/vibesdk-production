@@ -88,7 +88,7 @@ export class V1ProjectsController extends BaseController {
 
 			// Verify user exists
 			const userService = new UserService(env);
-			const user = await userService.getUserById(userId);
+			const user = await userService.findUser({ id: userId });
 
 			if (!user) {
 				return V1ProjectsController.createErrorResponse(
@@ -237,8 +237,13 @@ export class V1ProjectsController extends BaseController {
 			}
 
 			// Try to get live agent state for progress
-			let progress = null;
-			let previewUrl = null;
+			let progress: {
+				currentPhase: string;
+				filesGenerated: number;
+				totalFiles: number;
+				percentComplete: number;
+			} | undefined = undefined;
+			let previewUrl: string | null = null;
 
 			try {
 				const agentStub = await getAgentStub(env, projectId, true, this.logger);
@@ -254,7 +259,7 @@ export class V1ProjectsController extends BaseController {
 					const filesGenerated = Object.keys(state.generatedFilesMap).length;
 
 					progress = {
-						currentPhase: state.currentDevState,
+						currentPhase: String(state.currentDevState),
 						filesGenerated,
 						totalFiles,
 						percentComplete: totalFiles > 0

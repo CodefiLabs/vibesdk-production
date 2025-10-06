@@ -52,7 +52,7 @@ export async function apiKeyAuthMiddleware(
 
 		// Load user from userId
 		const userService = new UserService(c.env);
-		const user = await userService.getUserById(keyRecord.userId);
+		const user = await userService.findUser({ id: keyRecord.userId });
 
 		if (!user) {
 			logger.error('User not found for valid API key', { keyId: keyRecord.id, userId: keyRecord.userId });

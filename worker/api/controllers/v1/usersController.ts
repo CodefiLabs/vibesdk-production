@@ -40,16 +40,16 @@ export class V1UsersController extends BaseController {
 		request: Request,
 		env: Env,
 		_ctx: ExecutionContext,
-		context: RouteContext
+		_context: RouteContext
 	): Promise<ControllerResponse<ApiResponse<FindOrCreateUserResponse>>> {
 		try {
 			const bodyResult = await V1UsersController.parseJsonBody<FindOrCreateUserRequest>(request);
 
 			if (!bodyResult.success) {
-				return bodyResult.response!;
+				return bodyResult.response as ControllerResponse<ApiResponse<FindOrCreateUserResponse>>;
 			}
 
-			const { email, displayName, metadata } = bodyResult.data!;
+			const { email, displayName } = bodyResult.data!;
 
 			// Validate email
 			if (!email || !email.includes('@')) {
@@ -62,7 +62,7 @@ export class V1UsersController extends BaseController {
 			const userService = new UserService(env);
 
 			// Try to find existing user
-			let user = await userService.getUserByEmail(email);
+			let user = await userService.findUser({ email });
 			let isNew = false;
 
 			if (!user) {
@@ -107,7 +107,7 @@ export class V1UsersController extends BaseController {
 	 * GET /api/v1/users/:id
 	 */
 	static async getUserById(
-		request: Request,
+		_request: Request,
 		env: Env,
 		_ctx: ExecutionContext,
 		context: RouteContext
@@ -132,7 +132,7 @@ export class V1UsersController extends BaseController {
 			}
 
 			const userService = new UserService(env);
-			const user = await userService.getUserById(userId);
+			const user = await userService.findUser({ id: userId });
 
 			if (!user) {
 				return V1UsersController.createErrorResponse(
@@ -144,7 +144,7 @@ export class V1UsersController extends BaseController {
 			// Get apps count
 			const { AppService } = await import('../../../database/services/AppService');
 			const appService = new AppService(env);
-			const apps = await appService.getAppsByUserId(userId);
+			const appsCount = await appService.getUserAppsCount(userId);
 
 			return V1UsersController.createSuccessResponse({
 				user: {
@@ -153,7 +153,7 @@ export class V1UsersController extends BaseController {
 					displayName: user.displayName || user.email,
 					avatarUrl: user.avatarUrl || undefined,
 					createdAt: user.createdAt,
-					appsCount: apps.length
+					appsCount
 				}
 			});
 		} catch (error) {
