@@ -25,6 +25,13 @@ export async function apiKeyAuthMiddleware(
 
 		const apiKey = match[1];
 
+		// Debug logging
+		logger.debug('API key check', {
+			hasSecret: !!c.env.TS_API_KEY,
+			keyPrefix: apiKey.substring(0, 8),
+			secretPrefix: c.env.TS_API_KEY?.substring(0, 8)
+		});
+
 		// Check if this is the admin API key from Cloudflare secret
 		if (c.env.TS_API_KEY && apiKey === c.env.TS_API_KEY) {
 			logger.info('Using admin API key from TS_API_KEY secret');
