@@ -30,8 +30,8 @@ interface ApiKey {
 	id: string;
 	name: string;
 	keyPreview: string;
-	createdAt: string | null;
-	lastUsed: string | null;
+	createdAt: Date | null;
+	lastUsed: Date | null;
 	isActive: boolean | null;
 }
 
@@ -133,9 +133,10 @@ export function ApiKeysSection() {
 		}
 	};
 
-	const formatDate = (date: string | null) => {
+	const formatDate = (date: Date | null) => {
 		if (!date) return 'Never';
-		return new Date(date).toLocaleDateString('en-US', {
+		const dateObj = date instanceof Date ? date : new Date(date);
+		return dateObj.toLocaleDateString('en-US', {
 			year: 'numeric',
 			month: 'short',
 			day: 'numeric',
