@@ -7,6 +7,7 @@ import type { RouteContext } from '../../types/route-context';
 import type { ControllerResponse, ApiResponse } from '../types';
 import { getPreviewDomain } from '../../../utils/urls';
 import { ModelConfigService } from '../../../database/services/ModelConfigService';
+import type { CodeGenState } from '../../../agents/core/state';
 
 interface CreateProjectRequest {
 	userId: string;
@@ -246,7 +247,7 @@ export class V1ProjectsController extends BaseController {
 			try {
 				const agentStub = await getAgentStub(env, projectId, true, this.logger);
 				if (await agentStub.isInitialized()) {
-					const state = await agentStub.getFullState();
+					const state = await agentStub.getFullState() as CodeGenState;
 					previewUrl = await agentStub.getPreviewUrlCache();
 
 					const totalFiles = state.blueprint?.phases?.reduce(
