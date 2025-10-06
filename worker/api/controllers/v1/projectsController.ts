@@ -163,7 +163,7 @@ export class V1ProjectsController extends BaseController {
 
 			// Get template and initialize agent
 			const { sandboxSessionId, templateDetails, selection } =
-				await getTemplateForQuery(env, inferenceContext, instructions, V1ProjectsController.logger);
+				await getTemplateForQuery(env, inferenceContext, instructions, undefined, V1ProjectsController.logger);
 
 			const agentInstance = await getAgentStub(env, projectId, false, V1ProjectsController.logger);
 
