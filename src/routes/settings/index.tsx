@@ -1768,8 +1768,18 @@ export default function SettingsPage() {
 						</CardContent>
 					</Card>
 
-					{/* VibeSDK API Keys Section */}
-					<ApiKeysSection />
+					{/* VibeSDK API Keys Section - TEST */}
+					{user && (
+						<Card id="api-keys-test">
+							<CardHeader variant="minimal">
+								<CardTitle>API Keys Test</CardTitle>
+							</CardHeader>
+							<CardContent>
+								<p>If you can see this, the location works fine.</p>
+							</CardContent>
+						</Card>
+					)}
+					{/* {user && <ApiKeysSection />} */}
 
 					<div className="space-y-4 p-3">
 						<h4 className="font-medium text-destructive">
