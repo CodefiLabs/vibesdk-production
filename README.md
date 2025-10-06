@@ -191,7 +191,6 @@ OAuth configuration is **not** shown on the initial deploy page. If you want use
    ```
 4. Redeploy or restart local development so the new variables take effect.
 
-
 ---
 ## 🎨 How It Works
 
