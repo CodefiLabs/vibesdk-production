@@ -1171,11 +1171,17 @@ app.route('/api/v1', v1Router);
 ## Open Questions
 
 1. **API Key Scopes**: Should we implement fine-grained scopes (read/write per resource) or keep it simple initially?
+    Keep it simple for now
 2. **Webhook Retry Logic**: How many retries? Exponential backoff parameters?
+    We can use a default of 3 retries with a 1 second delay between retries.
 3. **Billing Integration**: Should API usage count towards paid tiers differently than web usage?
+    No billing integration for now.
 4. **Multi-User API Keys**: Should we support API keys that can create projects for multiple users (team/organization keys)?
+    No, we will only support API keys that can create projects for the user who owns the key. Currently we will only have a single admin API for everything
 5. **Streaming Support**: Should we support Server-Sent Events for real-time status updates in addition to WebSocket?
+    No
 6. **Versioning Strategy**: How to handle breaking changes in future API versions?
+    We will use semantic versioning for the API.
 
 ## Related Resources
 
