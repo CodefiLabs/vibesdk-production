@@ -114,7 +114,11 @@ After your analysis, format each fix as follows:
 # Brief, one-line comment on the issue
 
 \`\`\`
+<<<<<<< SEARCH
 [exact lines from current file]
+=======
+[your intended replacement]
+>>>>>>> REPLACE
 \`\`\`
 
 # Brief, one-line comment on the fix
@@ -162,7 +166,11 @@ CRITICAL REQUIREMENTS:
 
 Just reply with the corrected SEARCH/REPLACE blocks in this format:
 
+<<<<<<< SEARCH
 [exact lines from current file]
+=======
+[your intended replacement]
+>>>>>>> REPLACE`
 
 const userPromptFormatter = (user_prompt: string, query: string, file: FileOutputType, previousFiles?: FileOutputType[], currentPhase?: PhaseConceptType, issues?: string[]) => {
     const variables: Record<string, string> = {
@@ -455,7 +463,11 @@ ${currentDiff}
             // Format the failed blocks in the expected format for the new prompt
             const failedBlocksText = failedBlocks.map((block) =>
                 `## SearchReplaceNoExactMatch: This SEARCH block failed to exactly match lines in the file
+<<<<<<< SEARCH
 ${block.search}
+=======
+${block.replace}
+>>>>>>> REPLACE
 
 ${block.error}
 `).join('\n\n');
