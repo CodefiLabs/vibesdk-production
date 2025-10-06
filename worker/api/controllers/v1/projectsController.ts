@@ -250,12 +250,12 @@ export class V1ProjectsController extends BaseController {
 					const state = await agentStub.getFullState() as CodeGenState;
 					previewUrl = await agentStub.getPreviewUrlCache();
 
-					const totalFiles = state.blueprint?.phases?.reduce(
-						(sum: number, phase: any) => sum + phase.files.length,
+					const totalFiles = state.generatedPhases?.reduce(
+						(sum: number, phase: any) => sum + (phase.files?.length || 0),
 						0
 					) || 0;
 
-					const filesGenerated = Object.keys(state.generatedFilesMap).length;
+					const filesGenerated = Object.keys(state.generatedFilesMap || {}).length;
 
 					progress = {
 						currentPhase: String(state.currentDevState),
